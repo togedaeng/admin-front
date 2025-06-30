@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {
   Home,
   Users,
+  Dog,
   UserCheck,
   MessageSquare,
   HelpCircle,
@@ -29,8 +30,7 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
   const navItems = [
     { icon: Home, label: "대시보드", key: "dashboard", href: "/" },
     { icon: Users, label: "회원정보", key: "회원정보", href: "/users" },
-    { icon: UserCheck, label: "간이치정보", key: "guest", href: "/guest" },
-    { icon: MessageSquare, label: "커스텀 요청", key: "custom", href: "/custom" },
+    { icon: Dog, label: "강아지정보", key: "강아지정보", href: "/dogs" },
     { icon: HelpCircle, label: "문의사항", key: "inquiry", href: "/inquiry" },
     { icon: Megaphone, label: "공지사항", key: "notice", href: "/notice" },
   ]

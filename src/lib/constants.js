@@ -8,6 +8,43 @@ export const APP_CONFIG = {
   description: '관리자 대시보드',
 };
 
+// TogeDaeng 색상 시스템
+export const COLORS = {
+  primary: '#190a49',      // 메인 헤더 색상
+  accent: '#0078d2',       // 액센트 색상 (버튼, 링크)
+  background: '#e2e9ef',   // 메인 배경
+  white: '#ffffff',        // 카드 배경
+  border: '#dfe1e3',       // 보더 색상
+  textPrimary: '#000000',  // 메인 텍스트
+  textSecondary: '#404040', // 서브 텍스트
+  textMuted: '#bfc5c8',    // 비활성 텍스트
+  textLight: '#979797',    // 라이트 텍스트
+};
+
+// 상태별 색상 정의
+export const STATUS_COLORS = {
+  Active: {
+    bg: 'bg-emerald-100',
+    text: 'text-emerald-800',
+    border: 'border-emerald-200'
+  },
+  Hold: {
+    bg: 'bg-amber-100', 
+    text: 'text-amber-800',
+    border: 'border-amber-200'
+  },
+  Requested: {
+    bg: 'bg-sky-100',
+    text: 'text-sky-800', 
+    border: 'border-sky-200'
+  },
+  Inactive: {
+    bg: 'bg-slate-100',
+    text: 'text-slate-800',
+    border: 'border-slate-200'
+  }
+};
+
 // 네비게이션 메뉴 구성
 export const NAVIGATION_ITEMS = [
   {
