@@ -1,41 +1,37 @@
-'use client'
-
 import dynamic from 'next/dynamic'
+import React from 'react'
 
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
+const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false })
+
+const series = [44, 55, 13, 43]
+const options = {
+  chart: {
+    type: 'donut',
+    height: 200,
+    toolbar: { show: false },
+    width: '100%'
+  },
+  labels: ['Organic', 'Referral', 'Social', 'Direct'],
+  legend: {
+    position: 'bottom'
+  },
+  dataLabels: {
+    enabled: false
+  },
+  responsive: [
+    {
+      breakpoint: 1024,
+      options: {
+        chart: { height: 150 }
+      }
+    }
+  ]
+}
 
 export default function TrafficChart() {
-  const options = {
-    chart: {
-      type: 'donut',
-      toolbar: {
-        show: false,
-      },
-      height: 150,
-      width: '100%',
-    },
-    colors: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b'],
-    labels: ['Organic', 'Referral', 'Direct', 'Social'],
-    dataLabels: {
-      enabled: false,
-    },
-    legend: {
-      show: false,
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '70%',
-        },
-      },
-    },
-  }
-
-  const series = [44, 55, 13, 33]
-
   return (
-    <div id="grade" className="w-full h-[150px]">
-      <Chart options={options} series={series} type="donut" height={150} width="100%" />
+    <div style={{ width: '100%', overflowX: 'auto' }}>
+      <ReactApexChart options={options} series={series} type="donut" height={200} width="100%" />
     </div>
   )
 } 

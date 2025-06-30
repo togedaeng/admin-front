@@ -1,77 +1,69 @@
-'use client'
-
 import dynamic from 'next/dynamic'
+import React from 'react'
 
-const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
+const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false })
+
+const series = [
+  {
+    name: 'Profit',
+    type: 'column',
+    data: [44000, 55000, 41000, 67000, 22000, 43000, 55000]
+  },
+  {
+    name: 'Expenses',
+    type: 'line',
+    data: [23000, 42000, 35000, 27000, 18000, 21000, 32000]
+  }
+]
+
+const options = {
+  chart: {
+    height: 300,
+    type: 'line',
+    toolbar: { show: false },
+    width: '100%'
+  },
+  stroke: {
+    width: [0, 4]
+  },
+  title: {
+    text: undefined
+  },
+  dataLabels: {
+    enabled: true,
+    enabledOnSeries: [1]
+  },
+  labels: ['월', '화', '수', '목', '금', '토', '일'],
+  xaxis: {
+    type: 'category'
+  },
+  yaxis: [
+    {
+      title: {
+        text: 'Profit'
+      }
+    },
+    {
+      opposite: true,
+      title: {
+        text: 'Expenses'
+      }
+    }
+  ],
+  responsive: [
+    {
+      breakpoint: 1024,
+      options: {
+        chart: { height: 220 }
+      }
+    }
+  ]
+}
 
 export default function ProfitChart() {
-  const options = {
-    chart: {
-      type: 'area',
-      toolbar: {
-        show: false,
-      },
-      height: 300,
-      width: '100%',
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      curve: 'smooth',
-      width: 2,
-    },
-    colors: ['#3b82f6', '#ef4444'],
-    fill: {
-      type: 'gradient',
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: 0.7,
-        opacityTo: 0.1,
-        stops: [0, 90, 100],
-      },
-    },
-    xaxis: {
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-      labels: {
-        style: {
-          colors: '#6b7280',
-        },
-      },
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: '#6b7280',
-        },
-      },
-    },
-    grid: {
-      borderColor: '#e5e7eb',
-    },
-    legend: {
-      position: 'top',
-      horizontalAlign: 'right',
-      labels: {
-        colors: '#6b7280',
-      },
-    },
-  }
-
-  const series = [
-    {
-      name: 'Revenue',
-      data: [31, 40, 28, 51, 42, 109, 100],
-    },
-    {
-      name: 'Expenses',
-      data: [11, 32, 45, 32, 34, 52, 41],
-    },
-  ]
-
   return (
-    <div id="profit" className="w-full h-[300px]">
-      <Chart options={options} series={series} type="area" height={300} width="100%" />
+    <div style={{ width: '100%', overflowX: 'auto' }}>
+      <ReactApexChart options={options} series={series} type="line" height={300} width="100%" />
     </div>
   )
 } 

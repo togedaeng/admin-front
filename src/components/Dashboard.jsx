@@ -4,10 +4,10 @@ import { useState } from 'react'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import TopStrip from './TopStrip'
+import Timeline from './Timeline'
 import ProfitChart from './charts/ProfitChart'
 import TrafficChart from './charts/TrafficChart'
 import EarningChart from './charts/EarningChart'
-import Timeline from './Timeline'
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)

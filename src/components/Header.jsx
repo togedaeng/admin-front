@@ -5,12 +5,12 @@ import PropTypes from 'prop-types'
 
 function Header({ onMenuClick }) {
   return (
-    <header className="bg-white shadow-md w-full text-sm py-4 px-6 relative z-40">
+    <header className="bg-white shadow-md w-full text-sm py-4 px-6 sticky top-14 z-40">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={onMenuClick}
-            className="xl:hidden p-2 hover:bg-gray-100"
+            className="p-2 hover:bg-gray-100"
           >
             <Menu size={20} />
           </button>
