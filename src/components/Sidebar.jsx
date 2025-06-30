@@ -4,42 +4,36 @@ import { useState } from 'react'
 import Link from 'next/link'
 import {
   Home,
-  BarChart3,
   Users,
-  Settings,
-  FileText,
-  Mail,
-  Calendar,
-  ShoppingCart,
-  X,
-  ChevronDown,
-  ChevronUp,
+  UserCheck,
+  MessageSquare,
+  HelpCircle,
+  Megaphone,
   ChevronLeft,
   ChevronRight,
-  Package
+  X
 } from 'lucide-react'
-import { NAVIGATION_ITEMS } from '../lib/constants'
 import { classNames } from '../lib/utils'
 
 /**
- * 사이드바 컴포넌트
+ * 사이드바 컴포넌트 (TogeDaeng 스타일)
  * @param {Object} props - 컴포넌트 props
  * @param {boolean} props.isOpen - 사이드바 열림 상태 (모바일)
  * @param {Function} props.onClose - 사이드바 닫기 핸들러
  * @returns {JSX.Element} Sidebar 컴포넌트
  */
 function Sidebar({ isOpen = false, onClose = () => {} }) {
-  const [activeMenu, setActiveMenu] = useState('dashboard')
+  const [selectedNav, setSelectedNav] = useState('회원정보')
   const [collapsed, setCollapsed] = useState(false)
 
-  // 아이콘 매핑
-  const iconMap = {
-    'ti-layout-dashboard': Home,
-    'ti-users': Users,
-    'ti-package': Package,
-    'ti-shopping-cart': ShoppingCart,
-    'ti-settings': Settings,
-  }
+  const navItems = [
+    { icon: Home, label: "대시보드", key: "dashboard", href: "/" },
+    { icon: Users, label: "회원정보", key: "회원정보", href: "/users" },
+    { icon: UserCheck, label: "간이치정보", key: "guest", href: "/guest" },
+    { icon: MessageSquare, label: "커스텀 요청", key: "custom", href: "/custom" },
+    { icon: HelpCircle, label: "문의사항", key: "inquiry", href: "/inquiry" },
+    { icon: Megaphone, label: "공지사항", key: "notice", href: "/notice" },
+  ]
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed)
@@ -56,95 +50,71 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
       )}
 
       <aside className={classNames(
-        'fixed xl:static top-0 left-0 z-20 h-screen bg-white shadow-md',
-        'transform transition-transform duration-300 ease-in-out',
+        'fixed xl:static top-0 left-0 z-20 bg-white shadow-md',
+        'transform transition-all duration-300 ease-in-out',
         isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0',
-        collapsed ? 'w-[70px]' : 'w-[270px]',
-        'relative'
+        collapsed ? 'w-[70px]' : 'w-64',
+        'min-h-[calc(100vh-72px)]'
       )}>
         {/* 토글 버튼 */}
         <button 
           onClick={toggleSidebar}
-          className="absolute -right-3 top-20 bg-[#1b0a5c] text-white w-6 h-6 rounded-full flex items-center justify-center z-50 shadow-md hover:bg-[#0f0533] transition-colors"
+          className="absolute -right-3 top-6 bg-[#190a49] text-white w-6 h-6 rounded-full flex items-center justify-center z-50 shadow-md hover:bg-[#0f0533] transition-colors"
           aria-label={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
         >
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
+
+        {/* 모바일 닫기 버튼 */}
+        <button
+          onClick={onClose}
+          className="xl:hidden absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg"
+          aria-label="사이드바 닫기"
+        >
+          <X size={20} />
+        </button>
         
-        <div className="flex flex-col h-full">
-          {/* 헤더 */}
-          <div className="flex items-center justify-between p-6 border-b">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
-              {!collapsed && (
-                <span className="ml-3 text-xl font-semibold text-gray-800">
-                  Admin
-                </span>
-              )}
-            </div>
-            <button
-              onClick={onClose}
-              className="xl:hidden p-2 hover:bg-gray-100 rounded-lg"
-              aria-label="사이드바 닫기"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          {/* 네비게이션 */}
-          <nav className="flex-1 p-4 overflow-y-auto">
-            <div className="mb-6">
-              {!collapsed && (
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                  메인 메뉴
-                </h3>
-              )}
-              <ul className="space-y-2">
-                {NAVIGATION_ITEMS.map((item) => {
-                  const IconComponent = iconMap[item.icon] || Home
-                  const isActive = activeMenu === item.id
-                  
-                  return (
-                    <li key={item.id}>
-                      <Link
-                        href={item.href}
-                        className={classNames(
-                          'flex items-center px-4 py-3 rounded-lg transition-colors',
-                          isActive
-                            ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800',
-                          collapsed && 'justify-center'
-                        )}
-                        onClick={() => setActiveMenu(item.id)}
-                        title={collapsed ? item.label : ''}
-                      >
-                        <IconComponent 
-                          size={20} 
-                          className={collapsed ? 'mx-auto' : 'mr-3'} 
-                        />
-                        {!collapsed && item.label}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          </nav>
-
-          {/* 푸터 */}
+        <div className="p-4">
+          {/* 관리자 프로필 */}
           {!collapsed && (
-            <div className="p-4 border-t">
-              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-800">관리자</p>
-                  <p className="text-xs text-gray-500">admin@example.com</p>
+            <div className="mb-6">
+              <div className="flex items-center gap-3 p-3 bg-[#f5f5f5] rounded-lg">
+                <div className="w-10 h-10 bg-[#0078d2] rounded-full flex items-center justify-center">
+                  <span className="text-white font-medium">A</span>
                 </div>
+                <span className="text-[#bfc5c8] font-medium">Admin</span>
               </div>
             </div>
           )}
+
+          {/* 네비게이션 */}
+          <nav className="space-y-2">
+            {navItems.map((item) => {
+              const IconComponent = item.icon
+              const isActive = selectedNav === item.key
+              
+              return (
+                <Link
+                  key={item.key}
+                  href={item.href}
+                  className={classNames(
+                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors',
+                    isActive 
+                      ? 'bg-[#0078d2] text-white' 
+                      : 'text-[#bfc5c8] hover:bg-[#f5f5f5]',
+                    collapsed && 'justify-center'
+                  )}
+                  onClick={() => setSelectedNav(item.key)}
+                  title={collapsed ? item.label : ''}
+                >
+                  <IconComponent className="w-5 h-5 flex-shrink-0" />
+                  {!collapsed && (
+                    <span className="text-sm">{item.label}</span>
+                  )}
+                </Link>
+              )
+            })}
+          </nav>
         </div>
       </aside>
     </>

@@ -1,134 +1,149 @@
 'use client'
 
-import { useState } from 'react'
-import Sidebar from './Sidebar'
-import Header from './Header'
-import TopStrip from './TopStrip'
-import Timeline from './Timeline'
-import ProfitChart from './charts/ProfitChart'
-import TrafficChart from './charts/TrafficChart'
-import EarningChart from './charts/EarningChart'
+import { useState, useEffect } from 'react'
+import { Card, CardContent } from './ui/Card'
+import { SearchFilters } from './features/SearchFilters'
+import { MemberTable } from './features/MemberTable'
+import { Pagination } from './features/Pagination'
+import { useFetch } from '../hooks/useFetch'
 
-export default function Dashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+/**
+ * 대시보드 컴포넌트 (TogeDaeng 스타일)
+ * @returns {JSX.Element} Dashboard 컴포넌트
+ */
+function Dashboard() {
+  const [filters, setFilters] = useState({
+    email: '',
+    nickname: '',
+    sortOrder: '',
+    permission: '',
+    status: ''
+  })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [filteredMembers, setFilteredMembers] = useState([])
+
+  // 임시 회원 데이터 (실제로는 API에서 가져올 데이터)
+  const memberData = [
+    {
+      id: 1,
+      email: "dansunmusik7@gmail.com",
+      nickname: "서진",
+      gender: "여",
+      joinDate: "2025-01-01",
+      permission: "회원",
+      status: "활성화",
+    },
+    {
+      id: 2,
+      email: "gaeunyjragogo@gmail.com",
+      nickname: "가은",
+      gender: "여",
+      joinDate: "2025-01-01",
+      permission: "관리자",
+      status: "활성화",
+    },
+    {
+      id: 3,
+      email: "nanunyunjiya@gmail.com",
+      nickname: "윤지",
+      gender: "여",
+      joinDate: "2025-01-01",
+      permission: "회원",
+      status: "비활성화",
+    },
+    {
+      id: 4,
+      email: "dangwoo@gmail.com",
+      nickname: "당우",
+      gender: "남",
+      joinDate: "2025-01-01",
+      permission: "회원",
+      status: "활성화",
+    },
+    {
+      id: 5,
+      email: "dangdang@gmail.com",
+      nickname: "당당",
+      gender: "남",
+      joinDate: "2025-01-01",
+      permission: "회원",
+      status: "비활성화",
+    },
+  ]
+
+  // 필터링 로직
+  useEffect(() => {
+    let filtered = memberData.filter(member => {
+      const emailMatch = !filters.email || member.email.toLowerCase().includes(filters.email.toLowerCase())
+      const nicknameMatch = !filters.nickname || member.nickname.toLowerCase().includes(filters.nickname.toLowerCase())
+      const permissionMatch = !filters.permission || member.permission === filters.permission
+      const statusMatch = !filters.status || 
+        (filters.status === 'active' && member.status === '활성화') ||
+        (filters.status === 'inactive' && member.status === '비활성화')
+
+      return emailMatch && nicknameMatch && permissionMatch && statusMatch
+    })
+
+    // 정렬 적용
+    if (filters.sortOrder === 'latest') {
+      filtered.sort((a, b) => new Date(b.joinDate) - new Date(a.joinDate))
+    } else if (filters.sortOrder === 'oldest') {
+      filtered.sort((a, b) => new Date(a.joinDate) - new Date(b.joinDate))
+    }
+
+    setFilteredMembers(filtered)
+    setCurrentPage(1) // 필터 변경 시 첫 페이지로 이동
+  }, [filters])
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters)
+  }
+
+  const handleViewDetail = (member) => {
+    console.log('회원 상세 정보:', member)
+    // 실제로는 상세 페이지로 이동하거나 모달을 열 것
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  // 페이지네이션 계산
+  const itemsPerPage = 10
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentMembers = filteredMembers.slice(startIndex, endIndex)
 
   return (
-    <div className="bg-gray-100">
-      <TopStrip />
-      <div id="main-wrapper" className="flex p-5 xl:pr-0">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="w-full page-wrapper xl:px-6 px-0">
-          <main className="h-full max-w-full">
-            <div className="container full-container p-0 flex flex-col gap-6">
-              <Header onMenuClick={() => setSidebarOpen(true)} />
+    <div className="min-h-screen bg-[#e2e9ef] p-6">
+      <Card className="bg-white">
+        <CardContent className="p-6">
+          <h2 className="text-xl font-semibold text-[#000000] mb-6">
+            회원정보 ({filteredMembers.length}명)
+          </h2>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
-                <div className="col-span-2">
-                  <div className="card">
-                    <div className="card-body">
-                      <div className="flex justify-between mb-5">
-                        <h4 className="text-gray-600 text-lg font-semibold sm:mb-0 mb-2">
-                          Profit & Expenses
-                        </h4>
-                        <div className="relative">
-                          <button className="text-2xl text-gray-400 hover:text-gray-600">
-                            ⋮
-                          </button>
-                        </div>
-                      </div>
-                      <div className="w-full">
-                        <ProfitChart />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <SearchFilters 
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
 
-                <div className="flex flex-col gap-6">
-                  <div className="card">
-                    <div className="card-body">
-                      <h4 className="text-gray-600 text-lg font-semibold mb-4">
-                        Traffic Distribution
-                      </h4>
-                      <div className="flex items-center justify-between gap-12">
-                        <div>
-                          <h3 className="text-[22px] font-semibold text-gray-600 mb-4">
-                            $36,358
-                          </h3>
-                          <div className="flex items-center gap-1 mb-3">
-                            <span className="flex items-center justify-center w-5 h-5 bg-green-200">
-                              <span className="text-green-600">↗</span>
-                            </span>
-                            <p className="text-gray-600 text-sm font-normal">+9%</p>
-                            <p className="text-gray-500 text-sm font-normal text-nowrap">
-                              last year
-                            </p>
-                          </div>
-                          <div className="flex gap-4">
-                            <div className="flex gap-2 items-center">
-                              <span className="w-2 h-2 bg-blue-600"></span>
-                              <p className="text-gray-500 font-normal text-xs">Organic</p>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                              <span className="w-2 h-2 bg-red-500"></span>
-                              <p className="text-gray-500 font-normal text-xs">Referral</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center w-32 h-32">
-                          <TrafficChart />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+          <MemberTable 
+            members={currentMembers}
+            onViewDetail={handleViewDetail}
+          />
 
-                  <div className="card">
-                    <div className="card-body">
-                      <div className="flex gap-6 items-center justify-between">
-                        <div className="flex flex-col gap-4">
-                          <h4 className="text-gray-600 text-lg font-semibold">
-                            Product Sales
-                          </h4>
-                          <div className="flex flex-col gap-4">
-                            <h3 className="text-[22px] font-semibold text-gray-600">
-                              $6,820
-                            </h3>
-                            <div className="flex items-center gap-1">
-                              <span className="flex items-center justify-center w-5 h-5 bg-red-200">
-                                <span className="text-red-600">↘</span>
-                              </span>
-                              <p className="text-gray-600 text-sm font-normal">+9%</p>
-                              <p className="text-gray-500 text-sm font-normal text-nowrap">
-                                last year
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="w-11 h-11 flex justify-center items-center bg-red-500 text-white self-start">
-                          <span className="text-xl">$</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="w-full h-[100px]">
-                      <EarningChart />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
-                <div className="card">
-                  <div className="card-body">
-                    <h4 className="text-gray-600 text-lg font-semibold mb-5">
-                      Upcoming Schedules
-                    </h4>
-                    <Timeline />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main>
-        </div>
-      </div>
+          {totalPages > 1 && (
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
-} 
+}
+
+export default Dashboard; 
