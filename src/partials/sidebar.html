@@ -1,8 +1,12 @@
 <!-- ---------------------------------- -->
 <!-- Start Vertical Layout Sidebar -->
 <!-- ---------------------------------- -->
-<div class="p-4">
+<div class="p-4 relative">
   @@include("./logo-sidebar.html")
+  <!-- 사이드바 접기/펼치기 버튼 추가 -->
+  <div id="sidebar-toggle-btn" class="sidebar-toggle-btn">
+    <i class="ti ti-chevron-left"></i>
+  </div>
 </div>
 <div class="scroll-sidebar" data-simplebar="">
   <nav class=" w-full flex flex-col sidebar-nav px-4 mt-5">
@@ -609,13 +613,6 @@
                 href="#">
               <div class="flex items-center gap-4">
                 <i class="ti ti-circle text-xs"></i> <span>Tab</span>
-              </div>
-              <span class="text-white bg-blue-700 rounded-3xl px-2 text-xs py-0.5">Pro</span>
-            </a>
-            <a class="gap-4 py-2.5 my-1 px-[14px] text-sm flex items-center justify-between relative  rounded-md text-gray-500  w-full"
-                href="#">
-              <div class="flex items-center gap-4">
-                <i class="ti ti-circle text-xs"></i> <span>Typography</span>
               </div>
               <span class="text-white bg-blue-700 rounded-3xl px-2 text-xs py-0.5">Pro</span>
             </a>

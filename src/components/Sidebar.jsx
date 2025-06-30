@@ -12,48 +12,42 @@ import {
   Calendar,
   ShoppingCart,
   X,
-  LogIn,
-  UserPlus,
-  Type,
-  AlertTriangle,
-  CreditCard,
-  MousePointer,
-  Image as ImageIcon,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Package
 } from 'lucide-react'
-import PropTypes from 'prop-types'
+import { NAVIGATION_ITEMS } from '../lib/constants'
+import { classNames } from '../lib/utils'
 
-function Sidebar({ isOpen = false, onClose = () => { } }) {
+/**
+ * 사이드바 컴포넌트
+ * @param {Object} props - 컴포넌트 props
+ * @param {boolean} props.isOpen - 사이드바 열림 상태 (모바일)
+ * @param {Function} props.onClose - 사이드바 닫기 핸들러
+ * @returns {JSX.Element} Sidebar 컴포넌트
+ */
+function Sidebar({ isOpen = false, onClose = () => {} }) {
   const [activeMenu, setActiveMenu] = useState('dashboard')
-  const [componentsOpen, setComponentsOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
 
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/' },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3, href: '/analytics' },
-    { id: 'users', label: 'Users', icon: Users, href: '/users' },
-    { id: 'orders', label: 'Orders', icon: ShoppingCart, href: '/orders' },
-    { id: 'calendar', label: 'Calendar', icon: Calendar, href: '/calendar' },
-    { id: 'messages', label: 'Messages', icon: Mail, href: '/messages' },
-    { id: 'reports', label: 'Reports', icon: FileText, href: '/reports' },
-    { id: 'settings', label: 'Settings', icon: Settings, href: '/settings' },
-  ]
+  // 아이콘 매핑
+  const iconMap = {
+    'ti-layout-dashboard': Home,
+    'ti-users': Users,
+    'ti-package': Package,
+    'ti-shopping-cart': ShoppingCart,
+    'ti-settings': Settings,
+  }
 
-  const componentItems = [
-    { id: 'login', label: 'Login', icon: LogIn, href: '/login' },
-    { id: 'register', label: 'Register', icon: UserPlus, href: '/register' },
-    { id: 'buttons', label: 'Buttons', icon: MousePointer, href: '/buttons' },
-    { id: 'cards', label: 'Cards', icon: CreditCard, href: '/cards' },
-    { id: 'forms', label: 'Forms', icon: FileText, href: '/forms' },
-    { id: 'alerts', label: 'Alerts', icon: AlertTriangle, href: '/alerts' },
-    { id: 'typography', label: 'Typography', icon: Type, href: '/typography' },
-    { id: 'icons', label: 'Icons', icon: ImageIcon, href: '/icons' },
-    { id: 'sample', label: 'Sample Page', icon: FileText, href: '/sample' },
-  ]
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed)
+  }
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* 모바일 오버레이 */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 xl:hidden"
@@ -61,89 +55,76 @@ function Sidebar({ isOpen = false, onClose = () => { } }) {
         />
       )}
 
-      <aside className={`
-        fixed xl:static top-0 left-0 z-20 h-screen w-[270px] bg-white shadow-md
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'}
-      `}>
+      <aside className={classNames(
+        'fixed xl:static top-0 left-0 z-20 h-screen bg-white shadow-md',
+        'transform transition-transform duration-300 ease-in-out',
+        isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0',
+        collapsed ? 'w-[70px]' : 'w-[270px]',
+        'relative'
+      )}>
+        {/* 토글 버튼 */}
+        <button 
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-20 bg-[#1b0a5c] text-white w-6 h-6 rounded-full flex items-center justify-center z-50 shadow-md hover:bg-[#0f0533] transition-colors"
+          aria-label={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+        
         <div className="flex flex-col h-full">
-          {/* Header */}
+          {/* 헤더 */}
           <div className="flex items-center justify-between p-6 border-b">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-600 flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">A</span>
               </div>
-              <span className="ml-3 text-xl font-semibold text-gray-800">Admin</span>
+              {!collapsed && (
+                <span className="ml-3 text-xl font-semibold text-gray-800">
+                  Admin
+                </span>
+              )}
             </div>
             <button
               onClick={onClose}
-              className="xl:hidden p-2 hover:bg-gray-100"
+              className="xl:hidden p-2 hover:bg-gray-100 rounded-lg"
+              aria-label="사이드바 닫기"
             >
               <X size={20} />
             </button>
           </div>
 
-          {/* Navigation */}
+          {/* 네비게이션 */}
           <nav className="flex-1 p-4 overflow-y-auto">
             <div className="mb-6">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Main</h3>
+              {!collapsed && (
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                  메인 메뉴
+                </h3>
+              )}
               <ul className="space-y-2">
-                {menuItems.map((item) => {
-                  const Icon = item.icon
+                {NAVIGATION_ITEMS.map((item) => {
+                  const IconComponent = iconMap[item.icon] || Home
+                  const isActive = activeMenu === item.id
+                  
                   return (
                     <li key={item.id}>
                       <Link
                         href={item.href}
-                        className={`
-                          flex items-center px-4 py-3 transition-colors
-                          ${activeMenu === item.id
+                        className={classNames(
+                          'flex items-center px-4 py-3 rounded-lg transition-colors',
+                          isActive
                             ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
-                          }
-                        `}
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800',
+                          collapsed && 'justify-center'
+                        )}
                         onClick={() => setActiveMenu(item.id)}
+                        title={collapsed ? item.label : ''}
                       >
-                        <Icon size={20} className="mr-3" />
-                        {item.label}
-                      </Link>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-
-            <div className="mb-6">
-              <button
-                className="flex items-center w-full px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 hover:bg-gray-100 transition-colors"
-                onClick={() => setComponentsOpen((open) => !open)}
-                aria-expanded={componentsOpen}
-                aria-controls="sidebar-components-list"
-                type="button"
-              >
-                Components
-                {componentsOpen ? <ChevronUp className="ml-auto" size={18} /> : <ChevronDown className="ml-auto" size={18} />}
-              </button>
-              <ul
-                id="sidebar-components-list"
-                className={`space-y-2 transition-all duration-200 ${componentsOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
-              >
-                {componentItems.map((item) => {
-                  const Icon = item.icon
-                  return (
-                    <li key={item.id}>
-                      <Link
-                        href={item.href}
-                        className={`
-                          flex items-center px-4 py-3 transition-colors
-                          ${activeMenu === item.id
-                            ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
-                          }
-                        `}
-                        onClick={() => setActiveMenu(item.id)}
-                      >
-                        <Icon size={20} className="mr-3" />
-                        {item.label}
+                        <IconComponent 
+                          size={20} 
+                          className={collapsed ? 'mx-auto' : 'mr-3'} 
+                        />
+                        {!collapsed && item.label}
                       </Link>
                     </li>
                   )
@@ -152,25 +133,22 @@ function Sidebar({ isOpen = false, onClose = () => { } }) {
             </div>
           </nav>
 
-          {/* Footer */}
-          <div className="p-4 border-t">
-            <div className="flex items-center p-3 bg-gray-50">
-              <div className="w-8 h-8 bg-gray-300"></div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-800">Admin User</p>
-                <p className="text-xs text-gray-500">admin@example.com</p>
+          {/* 푸터 */}
+          {!collapsed && (
+            <div className="p-4 border-t">
+              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-800">관리자</p>
+                  <p className="text-xs text-gray-500">admin@example.com</p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </aside>
     </>
   )
-}
-
-Sidebar.propTypes = {
-  isOpen: PropTypes.bool,
-  onClose: PropTypes.func,
 }
 
 export default Sidebar; 
