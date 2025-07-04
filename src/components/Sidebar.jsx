@@ -24,12 +24,12 @@ import { classNames } from '../lib/utils'
  * @returns {JSX.Element} Sidebar 컴포넌트
  */
 function Sidebar({ isOpen = false, onClose = () => {} }) {
-  const [selectedNav, setSelectedNav] = useState('회원정보')
+  const [selectedNav, setSelectedNav] = useState('회원관리')
   const [collapsed, setCollapsed] = useState(false)
 
   const navItems = [
     { icon: Home, label: "대시보드", key: "dashboard", href: "/" },
-    { icon: Users, label: "회원정보", key: "회원정보", href: "/users" },
+    { icon: Users, label: "회원 관리", key: "회원관리", href: "/users" },
     { icon: Dog, label: "강아지정보", key: "강아지정보", href: "/dogs" },
     { icon: HelpCircle, label: "문의사항", key: "inquiry", href: "/inquiry" },
     { icon: Megaphone, label: "공지사항", key: "notice", href: "/notice" },
