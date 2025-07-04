@@ -12,7 +12,7 @@ export default function OAuthSuccessPage() {
     const processOAuthSuccess = () => {
       try {
         const accessToken = searchParams.get('accessToken');
-        const refreshToken = searchParams.get('refreshToken');
+        // const refreshToken = searchParams.get('refreshToken');
         const error = searchParams.get('error');
 
         if (error) {
@@ -21,15 +21,16 @@ export default function OAuthSuccessPage() {
           return;
         }
 
-        if (!accessToken || !refreshToken) {
+        if (!accessToken) { // refresh token 추가되어 있었음 
           setError("토큰을 받지 못했습니다.");
           setIsProcessing(false);
           return;
         }
 
         // 토큰을 localStorage에 저장
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('auth_token', accessToken);
+        // localStorage.setItem('accessToken', accessToken);
+        // localStorage.setItem('refreshToken', refreshToken);
 
         // 메인 페이지로 리디렉트
         router.push('/');

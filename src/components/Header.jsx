@@ -58,7 +58,7 @@ function Header({ onMenuClick }) {
           <div className="flex items-center gap-2">
             <Link href="/login">
               <Button variant="outline" size="sm" className="text-white border-white">
-                소셜 로그인
+                로그인
               </Button>
             </Link>
           </div>
