@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../../../hooks/useAuth";
 
 export default function GoogleCallbackPage() {
   const router = useRouter();
+  const { checkAuth } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +45,7 @@ export default function GoogleCallbackPage() {
           // 기존 회원 - JWT 토큰 받음
           const tokenData = await response.json();
           localStorage.setItem('auth_token', tokenData.accessToken);
+          await checkAuth();
           router.push('/'); // 메인 페이지로 이동
         } else if (response.status === 202) {
           // 신규 회원 - 추가 정보 입력 필요
@@ -61,7 +64,7 @@ export default function GoogleCallbackPage() {
     };
 
     handleOAuthCallback();
-  }, [router]);
+  }, [router, checkAuth]);
 
   if (isLoading) {
     return <div>구글 로그인 처리 중...</div>;
