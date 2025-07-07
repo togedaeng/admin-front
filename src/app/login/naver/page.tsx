@@ -9,7 +9,7 @@ export default function NaverLoginPage() {
     // Naver OAuth 설정과 일치하는 리디렉션 URI 사용
     const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    const redirectUri = `${backendUrl}/oauth/callback/naver`; // /auth 제거
+    const redirectUri = `${backendUrl}/login/naver/callback`;
     const state = Math.random().toString(36).substring(2, 15); // CSRF 방지용
     const responseType = "code";
     const oauthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}`;

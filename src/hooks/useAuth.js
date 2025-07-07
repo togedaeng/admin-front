@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../lib/api';
 import { STORAGE_KEYS } from '../lib/constants';
 
-/**
- * 인증 관련 상태와 함수를 제공하는 커스텀 훅
- * @returns {Object} 인증 상태와 관련 함수들
- */
-export function useAuth() {
+// 1. AuthContext 생성
+const AuthContext = createContext();
+
+// 2. AuthProvider 구현
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -17,15 +17,17 @@ export function useAuth() {
       const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
       if (!token) {
         setIsLoading(false);
+        setUser(null);
+        setIsAuthenticated(false);
         return;
       }
-
       const userData = await authAPI.getProfile();
       setUser(userData);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('인증 확인 실패:', error);
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      setUser(null);
       setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
@@ -37,7 +39,6 @@ export function useAuth() {
     try {
       setIsLoading(true);
       const response = await authAPI.login(credentials);
-      
       if (response.token) {
         localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token);
         setUser(response.user);
@@ -53,24 +54,17 @@ export function useAuth() {
   }, []);
 
   // 로그아웃 함수
-  const logout = useCallback(async () => {
-    try {
-      await authAPI.logout();
-    } catch (error) {
-      console.error('로그아웃 요청 실패:', error);
-    } finally {
-      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-      setUser(null);
-      setIsAuthenticated(false);
-    }
-  }, []);
+  const logout = async () => {
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    setUser(null);
+    setIsAuthenticated(false);
+  };
 
   // 회원가입 함수
   const register = useCallback(async (userData) => {
     try {
       setIsLoading(true);
       const response = await authAPI.register(userData);
-      
       if (response.token) {
         localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.token);
         setUser(response.user);
@@ -89,7 +83,8 @@ export function useAuth() {
     checkAuth();
   }, [checkAuth]);
 
-  return {
+  // Context value
+  const value = {
     user,
     isLoading,
     isAuthenticated,
@@ -98,4 +93,15 @@ export function useAuth() {
     register,
     checkAuth,
   };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+// 3. useAuth 훅: Context 소비자
+export function useAuth() {
+  return useContext(AuthContext);
 } 

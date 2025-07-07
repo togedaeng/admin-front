@@ -105,8 +105,8 @@ export const dashboardAPI = {
 
 export const usersAPI = {
   getUsers: () => apiGet('/user'),
-  getUser: (id) => apiGet(`/users/${id}`),
-  createUser: (userData) => apiPost('/users', userData),
-  updateUser: (id, userData) => apiPut(`/users/${id}`, userData),
-  deleteUser: (id) => apiDelete(`/users/${id}`),
+  getUser: (id) => apiGet(`/user/${id}`),
+  createUser: (userData) => apiPost('/user', userData),
+  updateUser: (id, userData) => apiPut(`/user/${id}`, userData),
+  deleteUser: (id) => apiDelete(`/user/${id}`),
 }; 
