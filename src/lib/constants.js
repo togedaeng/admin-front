@@ -1,5 +1,5 @@
 // API 관련 상수
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 // 애플리케이션 설정
 export const APP_CONFIG = {

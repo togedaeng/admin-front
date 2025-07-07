@@ -43,8 +43,7 @@ export default function NaverCallbackPage() {
         if (response.status === 200) {
           // 기존 회원 - JWT 토큰 받음
           const tokenData = await response.json();
-          localStorage.setItem('accessToken', tokenData.accessToken);
-          localStorage.setItem('refreshToken', tokenData.refreshToken);
+          localStorage.setItem('auth_token', tokenData.accessToken);
           router.push('/'); // 메인 페이지로 이동
         } else if (response.status === 202) {
           // 신규 회원 - 추가 정보 입력 필요

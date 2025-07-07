@@ -11,7 +11,7 @@ export default function LoginPage() {
           <div className="w-full card-body">
             <Link href="/" className="py-4 block">
               <Image
-                src="/assets/images/logos/logo-light.svg"
+                src="/public/images/logos/logo-light.svg"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -20,6 +20,7 @@ export default function LoginPage() {
             </Link>
             <div>
             
+            <div className="flex flex-col items-center gap-4 mt-6">
             {/* Google Login Button */}
               <Link href="/login/google">
                 <div className="gsi-material-button-content-wrapper" style={{ cursor: 'pointer' }}>
@@ -49,6 +50,9 @@ export default function LoginPage() {
               </Link>
 
             </div>
+            </div>
+
+            
           </div>
         </div>
       </div>

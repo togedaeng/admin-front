@@ -5,4 +5,6 @@ export * from './Input';
 export * from './Select';
 export * from './Table';
 export { default as DataTable } from './DataTable';
-export { default as FilterPanel } from './FilterPanel'; 
+export { default as FilterPanel } from './FilterPanel';
+export * from './Dropdown';
+export { default as ChevronDown } from './ChevronDown'; 

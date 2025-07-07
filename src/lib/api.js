@@ -95,7 +95,7 @@ export const authAPI = {
   login: (credentials) => apiPost('/auth/login', credentials),
   logout: () => apiPost('/auth/logout'),
   register: (userData) => apiPost('/auth/register', userData),
-  getProfile: () => apiGet('/auth/profile'),
+  getProfile: () => apiGet('/user/me'),
 };
 
 export const dashboardAPI = {
@@ -104,7 +104,7 @@ export const dashboardAPI = {
 };
 
 export const usersAPI = {
-  getUsers: () => apiGet('/users'),
+  getUsers: () => apiGet('/user'),
   getUser: (id) => apiGet(`/users/${id}`),
   createUser: (userData) => apiPost('/users', userData),
   updateUser: (id, userData) => apiPut(`/users/${id}`, userData),

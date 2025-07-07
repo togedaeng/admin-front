@@ -61,8 +61,7 @@ export default function SignupPage() {
 
       if (response.ok) {
         const tokenData = await response.json();
-        localStorage.setItem('accessToken', tokenData.token.accessToken);
-        localStorage.setItem('refreshToken', tokenData.token.refreshToken);
+        localStorage.setItem('auth_token', tokenData.token.accessToken);
         router.push('/'); // 메인 페이지로 이동
       } else {
         const errorData = await response.json();
