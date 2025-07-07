@@ -9,7 +9,7 @@ export default function GoogleLoginPage() {
     // Google Cloud Console 설정과 일치하는 리디렉션 URI 사용
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-    const redirectUri = `${backendUrl}/oauth/callback/google`; // /auth 제거
+    const redirectUri = `http://localhost:3000/login/google/callback`;
     const scope = "openid email profile";
     const responseType = "code";
     const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;

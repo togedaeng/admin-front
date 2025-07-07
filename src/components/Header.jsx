@@ -4,6 +4,7 @@ import { Bell, Settings } from 'lucide-react'
 import { Button } from './ui/Button'
 import { useAuth } from '../hooks/useAuth'
 import Link from 'next/link'
+import { useRouter } from "next/navigation";
 
 /**
  * 애플리케이션 헤더 컴포넌트 (TogeDaeng 스타일)
@@ -14,8 +15,11 @@ import Link from 'next/link'
 function Header({ onMenuClick }) {
   const { user, isAuthenticated, logout } = useAuth();
 
+  const router = useRouter();
+
   const handleLogout = async () => {
     await logout();
+    router.push('/');
   };
 
   return (

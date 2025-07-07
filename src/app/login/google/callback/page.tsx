@@ -35,7 +35,7 @@ export default function GoogleCallbackPage() {
           },
           body: JSON.stringify({ 
             code: code,
-            redirectUri: `${window.location.origin}/login/google/callback`
+            redirectUri: `http://localhost:3000/login/google/callback`
           }),
         });
 
