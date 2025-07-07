@@ -18,6 +18,7 @@ function Header({ onMenuClick }) {
   const router = useRouter();
 
   const handleLogout = async () => {
+    localStorage.removeItem('auth_token');
     await logout();
     router.push('/');
   };

@@ -54,17 +54,11 @@ export function AuthProvider({ children }) {
   }, []);
 
   // 로그아웃 함수
-  const logout = useCallback(async () => {
-    try {
-      await authAPI.logout();
-    } catch (error) {
-      console.error('로그아웃 요청 실패:', error);
-    } finally {
-      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-      setUser(null);
-      setIsAuthenticated(false);
-    }
-  }, []);
+  const logout = async () => {
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    setUser(null);
+    setIsAuthenticated(false);
+  };
 
   // 회원가입 함수
   const register = useCallback(async (userData) => {
