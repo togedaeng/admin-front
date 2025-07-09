@@ -109,4 +109,6 @@ export const usersAPI = {
   createUser: (userData) => apiPost('/user', userData),
   updateUser: (id, userData) => apiPut(`/user/${id}`, userData),
   deleteUser: (id) => apiDelete(`/user/${id}`),
+  getCustomhistorylist: (id) => apiGet(`/api/custom/list/${id}`),
+  getUsersDog: (id) => apiGet(`/api/dog/${id}`)
 }; 

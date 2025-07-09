@@ -5,12 +5,16 @@ import { DataTable } from "@/components/ui"
 import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem } from "@/components/ui/Dropdown";
 import ChevronDown from "@/components/ui/ChevronDown";
 import { usersAPI } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import StatusButton from "@/components/ui/StatusButton";
 
 /**
  * 사용자 관리 페이지
  * @returns {JSX.Element} 사용자 관리 페이지 컴포넌트
  */
 export default function UsersPage() {
+  const router = useRouter();
+
   // 드롭다운 상태 관리
   const [roleFilter, setRoleFilter] = useState("ALL")
   const [statusFilter, setStatusFilter] = useState("ALL")
@@ -152,12 +156,13 @@ export default function UsersPage() {
         </div>
       ),
       key: "role",
-      render: (v) =>
-        v === "ADMIN" ? (
-          <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-xs">관리자</span>
-        ) : (
-          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">회원</span>
-        ),
+      render: (v) => (
+        <StatusButton
+          label={v === 'ADMIN' ? '관리자' : '회원'}
+          type="role"
+          status={v}
+        />
+      ),
     },
     {
       header: (
@@ -178,11 +183,17 @@ export default function UsersPage() {
         </div>
       ),
       key: "status",
-      render: (v) => v === "ACTIVE"
-        ? <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">정상</span>
-        : v === "SUSPENDED"
-        ? <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">차단</span>
-        : <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">탈퇴</span>,
+      render: (v) => (
+        <StatusButton
+          label={
+            v === 'ACTIVE' ? '정상' :
+            v === 'SUSPENDED' ? '차단' :
+            v === 'WITHDRAWN' ? '탈퇴' : ''
+          }
+          type="userStatus"
+          status={v}
+        />
+      ),
     },
     {
       header: (
@@ -245,8 +256,7 @@ export default function UsersPage() {
   ]
 
   const handleRowAction = (row) => {
-    // 상세 페이지 이동 등
-    alert(`회원 ID: ${row.id}`)
+    router.push(`/users/${row.id}`);
   }
 
   return (

@@ -1,0 +1,66 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modalContent {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  width: 80%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: #000000;  /* ✅ 글씨색 검정 */
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  color: #000000;  /* ✅ 글씨색 검정 */
+}
+
+.modalHeader h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000000;  /* ✅ 글씨색 검정 */
+}
+
+.modalHeader button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #000000;  /* ✅ 글씨색 검정 */
+}
+
+.customTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: #000000;  /* ✅ 글씨색 검정 */
+}
+
+.customTable th,
+.customTable td {
+  border: 1px solid #e0e0e0;
+  padding: 6px 10px;
+  text-align: center;
+  color: #000000;  /* ✅ 글씨색 검정 */
+}
+
+.customTable th {
+  background-color: #f5f5f5;
+  font-weight: 500;
+  color: #000000;  /* ✅ 글씨색 검정 */
+}
