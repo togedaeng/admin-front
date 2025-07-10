@@ -1,11 +1,11 @@
 import styles from '@/assets/css/CustomHistoryModal.module.css'
-import StatusButton from '@/components/ui/StatusButton';  // 기존 StatusButton 재사용
-import { Search } from "lucide-react";
+import StatusButton from '@/components/ui/StatusButton'
+import { Search } from "lucide-react"
 
 function formatDate(dateStr) {
-  if (!dateStr) return '-';
-  const date = new Date(dateStr);
-  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
 }
 
 const statusLabel = {
@@ -14,7 +14,7 @@ const statusLabel = {
   COMPLETED: '완료',
   CANCELED: '취소',
   IN_PROGRESS: '진행중',
-};
+}
 
 export default function CustomHistoryModal({ history, onClose }) {
   return (
@@ -25,47 +25,53 @@ export default function CustomHistoryModal({ history, onClose }) {
           <button onClick={onClose}>✕</button>
         </div>
 
-        <table className={styles.customTable}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>담당자</th>
-              <th>상태</th>
-              <th>요청일</th>
-              <th>시작일</th>
-              <th>보류일</th>
-              <th>취소일</th>
-              <th>완료일</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {history.map(item => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.adminNickname ?? '-'}</td>
-                <td>
-                  <StatusButton label={statusLabel[item.status]} type="dogStatus" status={item.status} />
-                </td>
-                <td>{formatDate(item.createdAt)}</td>
-                <td>{formatDate(item.startedAt)}</td>
-                <td>{item.hold ? formatDate(item.hold.createdAt) : '-'}</td>
-                <td>{formatDate(item.canceledAt)}</td>
-                <td>{formatDate(item.completedAt)}</td>
-                <td>
-                    <button
-                        onClick={() => console.log('상세보기:', item.id)}  // 원하는 동작 넣기
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-                        title="자세히"
-                    >
-                        <Search className="w-4 h-4 text-[#404040]" />
-                    </button>
-                </td>
+        <div className={styles.tableWrapper}>
+          <table className={styles.customTable}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>담당자</th>
+                <th>상태</th>
+                <th>요청일</th>
+                <th>시작일</th>
+                <th>보류일</th>
+                <th>취소일</th>
+                <th>완료일</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {history.map(item => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{item.adminNickname ?? '-'}</td>
+                  <td>
+                    <StatusButton
+                      label={statusLabel[item.status] || item.status}
+                      type="dogStatus"
+                      status={item.status}
+                    />
+                  </td>
+                  <td>{formatDate(item.createdAt)}</td>
+                  <td>{formatDate(item.startedAt)}</td>
+                  <td>{item.hold ? formatDate(item.hold.createdAt) : '-'}</td>
+                  <td>{formatDate(item.canceledAt)}</td>
+                  <td>{formatDate(item.completedAt)}</td>
+                  <td>
+                    <button
+                      onClick={() => console.log('상세보기:', item.id)}
+                      className={styles.detailButton}
+                      title="자세히"
+                    >
+                      <Search className="w-4 h-4 text-[#404040]" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  );
+  )
 }

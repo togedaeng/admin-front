@@ -88,3 +88,25 @@
   height: 16px;
   color: #6b7280;
 }
+
+.usersSearchArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.usersSearchInput {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  width: 200px;
+}
+
+.usersPagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+}

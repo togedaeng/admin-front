@@ -7,7 +7,11 @@ import ChevronDown from "@/components/ui/ChevronDown";
 import { useRouter } from "next/navigation";
 import { applyFilters } from "@/hooks/applyFilters";
 import StatusButton from "@/components/ui/StatusButton";
-import styles from "@/assets/css/UsersPage.module.css";
+import styles from "@/assets/css/UserPage.module.css";
+import { usersAPI } from "@/lib/api";
+import SearchBar from "@/components/ui/SearchBar";
+import { Pagination } from "@/components/features/Pagination";
+import PageContainer from "@/components/ui/PageContainer";
 
 export default function UsersPage() {
   const router = useRouter();
@@ -18,6 +22,12 @@ export default function UsersPage() {
   const [joinDateSort, setJoinDateSort] = useState("latest");
   const [deleteDateSort, setDeleteDateSort] = useState("latest");
 
+  const [searchField, setSearchField] = useState("email");
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const [memberData, setMemberData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,9 +37,8 @@ export default function UsersPage() {
       try {
         setIsLoading(true);
         setError(null);
-        const response = await fetch("/api/users");
-        if (!response.ok) throw new Error("데이터 요청 실패");
-        const users = await response.json();
+        const users = await usersAPI.getUsers();
+        console.log(users);
         setMemberData(users || []);
       } catch (err) {
         console.error("사용자 데이터 로드 실패:", err);
@@ -48,8 +57,16 @@ export default function UsersPage() {
       status: statusFilter === "ALL" ? "" : statusFilter,
       gender: genderFilter === "ALL" ? "" : genderFilter,
     };
+    console.log(roleFilter, statusFilter, genderFilter)
 
-    const filtered = applyFilters(memberData, filterState);
+    let filtered = applyFilters(memberData, filterState);
+
+    if (searchKeyword) {
+      filtered = filtered.filter(item => {
+        const value = item[searchField]?.toLowerCase() || "";
+        return value.includes(searchKeyword.toLowerCase());
+      });
+    }
 
     const sorted = [...filtered].sort((a, b) => {
       const joinCompare = joinDateSort === "latest"
@@ -64,39 +81,36 @@ export default function UsersPage() {
     });
 
     return sorted;
-  }, [memberData, roleFilter, statusFilter, genderFilter, joinDateSort, deleteDateSort]);
+  }, [memberData, roleFilter, statusFilter, genderFilter, joinDateSort, deleteDateSort, searchField, searchKeyword]);
 
-  if (isLoading) {
-    return (
-      <div className={styles.usersPage}>
-        <div className={styles.usersCard}>
-          <div className={styles.usersCardContent}>
-            <h2 className={styles.usersTitle}>회원정보</h2>
-            <div className={styles.usersLoading}>
-              <div className={styles.usersSpinner}></div>
-              <span className={styles.usersLoadingText}>데이터를 불러오는 중...</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  if (error) {
-    return (
-      <div className={styles.usersPage}>
-        <div className={styles.usersCard}>
-          <div className={styles.usersCardContent}>
-            <h2 className={styles.usersTitle}>회원정보</h2>
-            <div className={styles.usersError}>
-              <div className={styles.usersErrorMessage}>{error}</div>
-              <button onClick={() => window.location.reload()} className={styles.usersRetryButton}>다시 시도</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleRowAction = (row) => {
+    router.push(`/users/${row.id}`);
+  };
+
+  // 상태 변경 시 콘솔 로그 추가
+  const handleRoleFilterChange = (value) => {
+    console.log("[UsersPage] roleFilter 변경:", value);
+    setRoleFilter(value);
+  };
+  const handleStatusFilterChange = (value) => {
+    console.log("[UsersPage] statusFilter 변경:", value);
+    setStatusFilter(value);
+  };
+  const handleGenderFilterChange = (value) => {
+    console.log("[UsersPage] genderFilter 변경:", value);
+    setGenderFilter(value);
+  };
+  const handleJoinDateSortChange = (value) => {
+    console.log("[UsersPage] joinDateSort 변경:", value);
+    setJoinDateSort(value);
+  };
+  const handleDeleteDateSortChange = (value) => {
+    console.log("[UsersPage] deleteDateSort 변경:", value);
+    setDeleteDateSort(value);
+  };
 
   const columns = [
     { header: "ID", key: "id" },
@@ -106,7 +120,7 @@ export default function UsersPage() {
       header: (
         <div className={styles.usersHeader}>
           <span>권한</span>
-          <Dropdown value={roleFilter} onValueChange={setRoleFilter}>
+          <Dropdown value={roleFilter} onValueChange={handleRoleFilterChange}>
             <DropdownTrigger className={styles.usersDropdownTrigger}>
               <ChevronDown className={styles.usersChevron} />
             </DropdownTrigger>
@@ -125,7 +139,7 @@ export default function UsersPage() {
       header: (
         <div className={styles.usersHeader}>
           <span>상태</span>
-          <Dropdown value={statusFilter} onValueChange={setStatusFilter}>
+          <Dropdown value={statusFilter} onValueChange={handleStatusFilterChange}>
             <DropdownTrigger className={styles.usersDropdownTrigger}>
               <ChevronDown className={styles.usersChevron} />
             </DropdownTrigger>
@@ -145,7 +159,7 @@ export default function UsersPage() {
       header: (
         <div className={styles.usersHeader}>
           <span>성별</span>
-          <Dropdown value={genderFilter} onValueChange={setGenderFilter}>
+          <Dropdown value={genderFilter} onValueChange={handleGenderFilterChange}>
             <DropdownTrigger className={styles.usersDropdownTrigger}>
               <ChevronDown className={styles.usersChevron} />
             </DropdownTrigger>
@@ -164,7 +178,7 @@ export default function UsersPage() {
       header: (
         <div className={styles.usersHeader}>
           <span>가입일</span>
-          <Dropdown value={joinDateSort} onValueChange={setJoinDateSort}>
+          <Dropdown value={joinDateSort} onValueChange={handleJoinDateSortChange}>
             <DropdownTrigger className={styles.usersDropdownTrigger}>
               <ChevronDown className={styles.usersChevron} />
             </DropdownTrigger>
@@ -182,7 +196,7 @@ export default function UsersPage() {
       header: (
         <div className={styles.usersHeader}>
           <span>삭제일</span>
-          <Dropdown value={deleteDateSort} onValueChange={setDeleteDateSort}>
+          <Dropdown value={deleteDateSort} onValueChange={handleDeleteDateSortChange}>
             <DropdownTrigger className={styles.usersDropdownTrigger}>
               <ChevronDown className={styles.usersChevron} />
             </DropdownTrigger>
@@ -198,18 +212,44 @@ export default function UsersPage() {
     },
   ];
 
-  const handleRowAction = (row) => {
-    router.push(`/users/${row.id}`);
-  };
+  if (isLoading) {
+    return (
+      <PageContainer title="회원정보">
+        <div className={styles.usersLoading}>
+          <div className={styles.usersSpinner}></div>
+          <span className={styles.usersLoadingText}>데이터를 불러오는 중...</span>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageContainer title="회원정보">
+        <div className={styles.usersError}>
+          <div className={styles.usersErrorMessage}>{error}</div>
+          <button onClick={() => window.location.reload()} className={styles.usersRetryButton}>다시 시도</button>
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
-    <div className={styles.usersPage}>
-      <div className={styles.usersCard}>
-        <div className={styles.usersCardContent}>
-          <h2 className={styles.usersTitle}>회원정보</h2>
-          <DataTable columns={columns} data={filteredData} onRowAction={handleRowAction} />
-        </div>
-      </div>
-    </div>
+    <PageContainer title="회원정보">
+      <SearchBar
+        searchField={searchField}
+        searchKeyword={searchKeyword}
+        onSearchFieldChange={setSearchField}
+        onSearchKeywordChange={setSearchKeyword}
+      />
+
+      <DataTable columns={columns} data={paginatedData} onRowAction={handleRowAction} />
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+    </PageContainer>
   );
 }
