@@ -47,8 +47,8 @@ export default function CustomHistoryModal({ history, onClose }) {
                   <td>{item.adminNickname ?? '-'}</td>
                   <td>
                     <StatusButton
-                      label={statusLabel[item.status] || item.status}
-                      type="dogStatus"
+                      label={statusLabel[item.status] || item.customStatus}
+                      type="customStatus"
                       status={item.status}
                     />
                   </td>

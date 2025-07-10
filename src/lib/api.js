@@ -112,3 +112,11 @@ export const usersAPI = {
   getCustomhistorylist: (id) => apiGet(`/api/custom/list/${id}`),
   getUsersDog: (id) => apiGet(`/api/dog/${id}`)
 }; 
+
+export const dogsAPI = {
+  getDogs: () => apiGet('/api/dog'),
+  getDog: (id) => apiGet(`/api/dog/${id}`),
+  createDog: (dogData) => apiPost('/dog', dogData),
+  updateDog: (id, dogData) => apiPut(`/dog/${id}`, dogData),
+  deleteDog: (id) => apiDelete(`/dog/${id}`),
+};
