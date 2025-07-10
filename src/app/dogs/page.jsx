@@ -1,144 +1,107 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { DataTable, FilterPanel } from "@/components/ui"
+import { useState, useEffect, useMemo } from "react";
+import { DataTable } from "@/components/ui";
+import StatusButton from "@/components/ui/StatusButton";
+import { dogsAPI } from "@/lib/api";
+import PageContainer from "@/components/ui/PageContainer";
+import { Pagination } from "@/components/features/Pagination";
+
+const dogStatusLabel = {
+  REGISTERED: "요청",
+  APPROVED: "승인",
+  SUSPENDED: "중지",
+  REMOVED: "삭제"
+};
 
 export default function DogsPage() {
-  const [filters, setFilters] = useState({
-    dogName: '',
-    ownerName: '',
-    sortOrder: '',
-    status: '',
-    modelingWait: false,
-    deletedDogs: false
-  })
+  const [dogData, setDogData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
-  const [currentPage, setCurrentPage] = useState(1)
+  useEffect(() => {
+    const fetchDogs = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const dogs = await dogsAPI.getDogs();
+        setDogData(dogs || []);
+      } catch (err) {
+        setError("반려견 데이터를 불러오는데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDogs();
+  }, []);
 
-  const dogData = [
-    { name: "모카", status: "Active", owner: "서현", registrationDate: "2025-01-01", deletionDate: "-" },
-    { name: "율무", status: "Hold", owner: "다은", registrationDate: "2025-01-01", deletionDate: "-" },
-    { name: "호두", status: "Active", owner: "임정", registrationDate: "2025-01-01", deletionDate: "-" },
-    { name: "꾸꾸", status: "Requested", owner: "갱갱", registrationDate: "2025-01-01", deletionDate: "-" },
-    { name: "호랑", status: "Hold", owner: "큰나", registrationDate: "2025-01-01", deletionDate: "-" },
-    { name: "별이", status: "Inactive", owner: "누나", registrationDate: "2025-01-01", deletionDate: "2025-03-01" },
-    { name: "별이", status: "Inactive", owner: "누나", registrationDate: "2025-01-01", deletionDate: "2025-03-01" },
-  ]
+  const paginatedData = useMemo(() => {
+    return dogData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [dogData, currentPage]);
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Active':
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200";
-      case 'Hold':
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200";
-      case 'Requested':
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800 border border-sky-200";
-      case 'Inactive':
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200";
-      default:
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200";
-    }
-  }
+  const totalPages = Math.ceil(dogData.length / itemsPerPage);
 
-  // 필터 정의
-  const filterConfig = [
-    { type: 'search', key: 'dogName', placeholder: '강아지 이름' },
-    { type: 'search', key: 'ownerName', placeholder: '주인 닉네임' },
-    { 
-      type: 'select', 
-      key: 'sortOrder', 
-      placeholder: '최신순',
-      options: [
-        { value: 'latest', label: '최신순' },
-        { value: 'oldest', label: '오래된순' }
-      ]
-    },
-    { 
-      type: 'select', 
-      key: 'status', 
-      placeholder: '상태',
-      options: [
-        { value: 'Active', label: 'Active' },
-        { value: 'Hold', label: 'Hold' },
-        { value: 'Requested', label: 'Requested' },
-        { value: 'Inactive', label: 'Inactive' }
-      ]
-    },
-    { type: 'empty' } // 5번째 컬럼을 위한 빈 공간
-  ]
+  const handleRowAction = (row) => {
+    // 상세 페이지 이동 등 구현
+    // router.push(`/dogs/${row.id}`)
+    console.log("반려견 상세 정보:", row);
+  };
 
-  const checkboxConfig = [
-    { key: 'modelingWait', label: '모델링 대기' },
-    { key: 'deletedDogs', label: '삭제한 강아지' }
-  ]
-
-  // 테이블 컬럼 정의
   const columns = [
-    { key: 'name', header: '강아지 이름' },
-    { 
-      key: 'status', 
-      header: '상태',
-      render: (value) => (
-        <span className={getStatusBadge(value)}>
-          {value}
-        </span>
-      )
+    { header: "ID", key: "id" },
+    { header: "이름", key: "name" },
+    { header: "주인 닉네임", key: "ownerNickname" },
+    {
+      header: "상태",
+      key: "status",
+      render: (v) => (
+        <StatusButton label={dogStatusLabel[v] || v} type="dogStatus" status={v} />
+      ),
     },
-    { key: 'owner', header: '주인 닉네임' },
-    { key: 'registrationDate', header: '등록일' },
-    { key: 'deletionDate', header: '삭제일' }
-  ]
+    {
+      header: "등록일",
+      key: "createdAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+    {
+      header: "삭제일",
+      key: "deletedAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+  ];
 
-  // 페이지네이션 계산
-  const itemsPerPage = 10
-  const totalPages = Math.ceil(dogData.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentData = dogData.slice(startIndex, endIndex)
-
-  const pagination = {
-    currentPage,
-    totalPages
+  if (isLoading) {
+    return (
+      <PageContainer title="반려견 정보">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0' }}>
+          <div style={{ border: '4px solid rgba(0,0,0,0.1)', borderTop: '4px solid #2563eb', borderRadius: '50%', width: 32, height: 32, animation: 'spin 1s linear infinite' }} />
+          <span style={{ marginTop: 8, color: '#4b5563' }}>데이터를 불러오는 중...</span>
+        </div>
+      </PageContainer>
+    );
   }
 
-  const handleFilterChange = (newFilters) => {
-    setFilters(newFilters)
-    setCurrentPage(1) // 필터 변경 시 첫 페이지로 이동
-  }
-
-  const handleRowAction = (dog) => {
-    console.log('강아지 상세 정보:', dog)
-    // 실제로는 상세 페이지로 이동하거나 모달을 열 것
-  }
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
-    }
+  if (error) {
+    return (
+      <PageContainer title="반려견 정보">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0' }}>
+          <div style={{ color: '#dc2626', marginBottom: 8 }}>{error}</div>
+          <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '8px 16px', backgroundColor: '#2563eb', color: '#fff', borderRadius: 6, border: 'none', cursor: 'pointer' }}>다시 시도</button>
+        </div>
+      </PageContainer>
+    );
   }
 
   return (
-    <div className="p-6">
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold text-[#000000] mb-6">반려견 정보</h2>
-
-          <FilterPanel 
-            filters={filterConfig}
-            values={filters}
-            onChange={handleFilterChange}
-            checkboxes={checkboxConfig}
-          />
-
-          <DataTable 
-            columns={columns}
-            data={currentData}
-            onRowAction={handleRowAction}
-            pagination={pagination}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      </div>
-    </div>
-  )
+    <PageContainer title="반려견 정보">
+      <DataTable columns={columns} data={paginatedData} onRowAction={handleRowAction} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+    </PageContainer>
+  );
 } 
