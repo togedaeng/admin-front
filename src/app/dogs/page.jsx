@@ -7,6 +7,7 @@ import StatusButton from "@/components/ui/StatusButton";
 import { dogsAPI } from "@/lib/api";
 import PageContainer from "@/components/ui/PageContainer";
 import { Pagination } from "@/components/features/Pagination";
+import { useRouter } from "next/navigation";
 
 const dogStatusLabel = {
   REGISTERED: "요청",
@@ -16,6 +17,7 @@ const dogStatusLabel = {
 };
 
 export default function DogsPage() {
+  const router = useRouter();
   const [dogData, setDogData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);

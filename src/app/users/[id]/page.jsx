@@ -47,8 +47,7 @@ export default function UserDetailPage() {
     try {
       const dogData = await usersAPI.getUsersDog(dog.id);
       console.log('반려견 데이터 : ', dogData);
-
-      // router.push(`/dogs/${dog.id}`);
+      router.push(`/dogs/${dog.id}`);
     } catch (error) {
       console.error('반려견 정보 조회 실패:', error);
       alert('반려견 상세 정보를 불러오지 못했습니다.');
