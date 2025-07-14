@@ -12,7 +12,8 @@ import {
   Megaphone,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  ListTodo
 } from 'lucide-react'
 import { classNames } from '../lib/utils'
 
@@ -30,7 +31,8 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
   const navItems = [
     { icon: Home, label: "대시보드", key: "dashboard", href: "/" },
     { icon: Users, label: "회원 관리", key: "회원관리", href: "/users" },
-    { icon: Dog, label: "강아지정보", key: "강아지정보", href: "/dogs" },
+    { icon: Dog, label: "반려견 정보", key: "반려견 정보", href: "/dogs" },
+    { icon: ListTodo, label: "커스텀 요청", key: "커스텀 요청", href: "/customs" },
     { icon: HelpCircle, label: "문의사항", key: "inquiry", href: "/inquiry" },
     { icon: Megaphone, label: "공지사항", key: "notice", href: "/notice" },
   ]

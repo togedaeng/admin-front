@@ -120,3 +120,8 @@ export const dogsAPI = {
   updateDog: (id, dogData) => apiPut(`/dog/${id}`, dogData),
   deleteDog: (id) => apiDelete(`/dog/${id}`),
 };
+
+export const customsAPI = {
+  getCustoms: () => apiGet('/api/custom'),
+  getCustom: (id) => apiGet(`/api/custom/${id}`)
+}
