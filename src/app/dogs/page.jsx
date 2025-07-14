@@ -1,5 +1,6 @@
 "use client"
 
+<<<<<<< Updated upstream
 import { useState } from "react"
 import { DataTable, FilterPanel } from "@/components/ui"
 
@@ -12,6 +13,31 @@ export default function DogsPage() {
     modelingWait: false,
     deletedDogs: false
   })
+=======
+import { useState, useEffect, useMemo } from "react";
+import { DataTable } from "@/components/ui";
+import StatusButton from "@/components/ui/StatusButton";
+import { dogsAPI } from "@/lib/api";
+import PageContainer from "@/components/ui/PageContainer";
+import { Pagination } from "@/components/features/Pagination";
+import { useRouter } from "next/navigation";
+
+const dogStatusLabel = {
+  REGISTERED: "요청",
+  APPROVED: "승인",
+  SUSPENDED: "중지",
+  REMOVED: "삭제"
+};
+
+export default function DogsPage() {
+  const router = useRouter();
+
+  const [dogData, setDogData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+>>>>>>> Stashed changes
 
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -25,6 +51,7 @@ export default function DogsPage() {
     { name: "별이", status: "Inactive", owner: "누나", registrationDate: "2025-01-01", deletionDate: "2025-03-01" },
   ]
 
+<<<<<<< Updated upstream
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Active':
@@ -38,6 +65,46 @@ export default function DogsPage() {
       default:
         return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200";
     }
+=======
+  const totalPages = Math.ceil(dogData.length / itemsPerPage);
+
+  const handleRowAction = (row) => {
+    router.push(`/dogs/${row.id}`);
+  };
+
+  const columns = [
+    { header: "ID", key: "id" },
+    { header: "이름", key: "name" },
+    { header: "주인 닉네임", key: "ownerNickname" },
+    {
+      header: "상태",
+      key: "status",
+      render: (v) => (
+        <StatusButton label={dogStatusLabel[v] || v} type="dogStatus" status={v} />
+      ),
+    },
+    {
+      header: "등록일",
+      key: "createdAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+    {
+      header: "삭제일",
+      key: "deletedAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+  ];
+
+  if (isLoading) {
+    return (
+      <PageContainer title="반려견 정보">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0' }}>
+          <div style={{ border: '4px solid rgba(0,0,0,0.1)', borderTop: '4px solid #2563eb', borderRadius: '50%', width: 32, height: 32, animation: 'spin 1s linear infinite' }} />
+          <span style={{ marginTop: 8, color: '#4b5563' }}>데이터를 불러오는 중...</span>
+        </div>
+      </PageContainer>
+    );
+>>>>>>> Stashed changes
   }
 
   // 필터 정의

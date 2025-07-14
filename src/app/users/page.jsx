@@ -37,6 +37,28 @@ export default function UsersPage() {
       } finally {
         setIsLoading(false)
       }
+<<<<<<< Updated upstream
+=======
+    };
+
+    fetchUsers();
+  }, []);
+
+  const filteredData = useMemo(() => {
+    const filterState = {
+      role: roleFilter === "ALL" ? "" : roleFilter,
+      status: statusFilter === "ALL" ? "" : statusFilter,
+      gender: genderFilter === "ALL" ? "" : genderFilter,
+    };
+
+    let filtered = applyFilters(memberData, filterState);
+
+    if (searchKeyword) {
+      filtered = filtered.filter(item => {
+        const value = item[searchField]?.toLowerCase() || "";
+        return value.includes(searchKeyword.toLowerCase());
+      });
+>>>>>>> Stashed changes
     }
 
     fetchUsers()

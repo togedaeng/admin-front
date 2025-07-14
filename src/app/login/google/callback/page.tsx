@@ -12,7 +12,6 @@ export default function GoogleCallbackPage() {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
-        // URL에서 authorization code 추출
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get("code");
         const error = urlParams.get("error");

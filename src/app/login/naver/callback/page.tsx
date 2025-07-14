@@ -1,19 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../../../hooks/useAuth";
 
 export default function NaverCallbackPage() {
   const router = useRouter();
+  const { checkAuth } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
-        // URL에서 authorization code 추출
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get("code");
-        const state = urlParams.get("state");
         const error = urlParams.get("error");
         
         if (error) {
