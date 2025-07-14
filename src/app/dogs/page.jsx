@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useState, useEffect, useMemo } from "react";
 import { DataTable } from "@/components/ui";
 import StatusButton from "@/components/ui/StatusButton";
@@ -44,9 +45,7 @@ export default function DogsPage() {
   const totalPages = Math.ceil(dogData.length / itemsPerPage);
 
   const handleRowAction = (row) => {
-    // 상세 페이지 이동 등 구현
-    // router.push(`/dogs/${row.id}`)
-    console.log("반려견 상세 정보:", row);
+    router.push(`/dogs/${row.id}`);
   };
 
   const columns = [

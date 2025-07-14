@@ -57,7 +57,6 @@ export default function UsersPage() {
       status: statusFilter === "ALL" ? "" : statusFilter,
       gender: genderFilter === "ALL" ? "" : genderFilter,
     };
-    console.log(roleFilter, statusFilter, genderFilter)
 
     let filtered = applyFilters(memberData, filterState);
 
@@ -69,20 +68,20 @@ export default function UsersPage() {
     }
 
     const sorted = [...filtered].sort((a, b) => {
-      const joinCompare = joinDateSort === "latest"
-        ? (b.createdAt || "").localeCompare(a.createdAt || "")
-        : (a.createdAt || "").localeCompare(b.createdAt || "");
+    const joinCompare = joinDateSort === "latest"
+      ? (b.createdAt || "").localeCompare(a.createdAt || "")
+      : (a.createdAt || "").localeCompare(b.createdAt || "");
 
-      const deleteCompare = deleteDateSort === "latest"
-        ? (b.deletedAt || "").localeCompare(a.deletedAt || "")
-        : (a.deletedAt || "").localeCompare(b.deletedAt || "");
+    const deleteCompare = deleteDateSort === "latest"
+      ? (b.deletedAt || "").localeCompare(a.deletedAt || "")
+      : (a.deletedAt || "").localeCompare(b.deletedAt || "");
 
-      return joinCompare || deleteCompare;
-    });
+    return joinCompare || deleteCompare;
+  });
 
-    return sorted;
+  return sorted;
   }, [memberData, roleFilter, statusFilter, genderFilter, joinDateSort, deleteDateSort, searchField, searchKeyword]);
-
+  
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
