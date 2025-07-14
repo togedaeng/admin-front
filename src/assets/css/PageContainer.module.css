@@ -1,0 +1,25 @@
+.pageContainer {
+  padding: 24px;
+  background-color: #E2E9EF;
+  min-height: 100%;
+}
+
+.pageCard {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+}
+
+.pageTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 20px;
+}
+
+.pageContent {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+}
