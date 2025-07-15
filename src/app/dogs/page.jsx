@@ -96,13 +96,12 @@ export default function DogsPage() {
   }
 
   return (
-    <PageContainer title="반려견 정보">
+    <PageContainer title="반려견 정보"
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={setCurrentPage}
+    >
       <DataTable columns={columns} data={paginatedData} onRowAction={handleRowAction} />
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
     </PageContainer>
   );
 } 

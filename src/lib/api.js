@@ -141,3 +141,4 @@ export const dogsAPI = {
 export const customsAPI = {
   getCustoms: () => apiGet('/api/custom'),
   getCustom: (id) => apiGet(`/api/custom/${id}`)
+};

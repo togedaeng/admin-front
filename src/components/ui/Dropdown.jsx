@@ -92,7 +92,7 @@ export function DropdownItem({ children, value: itemValue, onValueChange, setOpe
       {...props}
     >
       {children}
-    </button>
+    </li>
   );
 }
 DropdownItem.displayName = "DropdownItem";

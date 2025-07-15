@@ -141,7 +141,11 @@ export default function UsersPage() {
   }
 
   return (
-    <PageContainer title="회원정보">
+    <PageContainer title="회원정보"
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={setCurrentPage}
+    >
       <UserFilters
         searchField={searchField}
         searchKeyword={searchKeyword}
@@ -158,14 +162,7 @@ export default function UsersPage() {
         deleteDateSort={deleteDateSort}
         onDeleteDateSortChange={setDeleteDateSort}
       />
-
       <DataTable columns={columns} data={paginatedData} onRowAction={handleRowAction} />
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
     </PageContainer>
   );
 }

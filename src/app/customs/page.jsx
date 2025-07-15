@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { DataTable } from "@/components/ui";
 import StatusButton from "@/components/ui/StatusButton";
 import { customsAPI } from "@/lib/api";
@@ -18,7 +18,7 @@ const customStatusLabel = {
 
 export default function CustomsPage() {
   const router = useRouter();
-  const [customData, setCustomData] = useState([]);
+  const [customPage, setCustomPage] = useState(null); // Page 객체 전체 저장
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,8 +29,9 @@ export default function CustomsPage() {
       try {
         setIsLoading(true);
         setError(null);
-        const customs = await customsAPI.getCustoms();
-        setCustomData(customs || []);
+        // 백엔드 API가 page=0부터 시작하므로 -1
+        const data = await customsAPI.getCustoms({ page: currentPage - 1, size: itemsPerPage });
+        setCustomPage(data);
       } catch (err) {
         setError("커스텀 요청 데이터를 불러오는데 실패했습니다.");
       } finally {
@@ -38,13 +39,10 @@ export default function CustomsPage() {
       }
     };
     fetchCustoms();
-  }, []);
+  }, [currentPage]);
 
-  const paginatedData = useMemo(() => {
-    return customData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  }, [customData, currentPage]);
-
-  const totalPages = Math.ceil(customData.length / itemsPerPage);
+  const tableData = customPage?.content || [];
+  const totalPages = customPage?.totalPages || 1;
 
   const handleRowAction = (row) => {
     router.push(`/customs/${row.id}`);
@@ -52,8 +50,9 @@ export default function CustomsPage() {
 
   const columns = [
     { header: "ID", key: "id" },
-    { header: "이름", key: "name" },
+    { header: "반려견 이름", key: "dogName" },
     { header: "주인 닉네임", key: "ownerNickname" },
+    { header: "담당자", key: "adminNickname" },
     {
       header: "상태",
       key: "status",
@@ -62,13 +61,28 @@ export default function CustomsPage() {
       ),
     },
     {
-      header: "등록일",
+      header: "요청일",
       key: "createdAt",
       render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
     },
     {
-      header: "삭제일",
-      key: "deletedAt",
+      header: "작업시작일",
+      key: "startedAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+    {
+      header: "보류일",
+      key: "holdCreatedAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+    {
+      header: "완료일",
+      key: "completedAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+    {
+      header: "취소일",
+      key: "canceledAt",
       render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
     },
   ];
@@ -96,13 +110,12 @@ export default function CustomsPage() {
   }
 
   return (
-    <PageContainer title="커스텀 요청 정보">
-      <DataTable columns={columns} data={paginatedData} onRowAction={handleRowAction} />
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+    <PageContainer title="커스텀 요청 정보"
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={setCurrentPage}
+    >
+      <DataTable columns={columns} data={tableData} onRowAction={handleRowAction} />
     </PageContainer>
   );
 } 
