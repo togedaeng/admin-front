@@ -15,27 +15,44 @@ const defaultHeaders = {
  */
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   const config = {
     headers: defaultHeaders,
     ...options,
   };
 
+  // FormData인 경우 Content-Type을 자동으로 설정하도록 헤더 제거
+  if (options.body instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
+
   // 인증 토큰이 있다면 헤더에 추가
   const token = localStorage.getItem('auth_token');
+  console.log('인증 토큰 확인:', token);
+  console.log('현재 요청 URL:', url);
+  console.log('요청 헤더:', config.headers);
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    console.warn('인증 토큰이 없습니다. 백엔드에서 인증을 요구할 수 있습니다.');
   }
 
   try {
     const response = await fetch(url, config);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
-    const data = await response.json();
-    return data;
+
+    // 응답이 JSON이 아닐 수 있으므로 확인
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      return data;
+    } else {
+      return response;
+    }
   } catch (error) {
     console.error('API request failed:', error);
     throw error;
@@ -124,4 +141,3 @@ export const dogsAPI = {
 export const customsAPI = {
   getCustoms: () => apiGet('/api/custom'),
   getCustom: (id) => apiGet(`/api/custom/${id}`)
-}

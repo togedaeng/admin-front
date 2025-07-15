@@ -1,5 +1,5 @@
 // API 관련 상수
-export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+export const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
 
 // 애플리케이션 설정
 export const APP_CONFIG = {
@@ -29,13 +29,13 @@ export const STATUS_COLORS = {
     border: 'border-emerald-200'
   },
   Hold: {
-    bg: 'bg-amber-100', 
+    bg: 'bg-amber-100',
     text: 'text-amber-800',
     border: 'border-amber-200'
   },
   Requested: {
     bg: 'bg-sky-100',
-    text: 'text-sky-800', 
+    text: 'text-sky-800',
     border: 'border-sky-200'
   },
   Inactive: {

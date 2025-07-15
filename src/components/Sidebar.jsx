@@ -24,7 +24,7 @@ import { classNames } from '../lib/utils'
  * @param {Function} props.onClose - 사이드바 닫기 핸들러
  * @returns {JSX.Element} Sidebar 컴포넌트
  */
-function Sidebar({ isOpen = false, onClose = () => {} }) {
+function Sidebar({ isOpen = false, onClose = () => { } }) {
   const [selectedNav, setSelectedNav] = useState('회원관리')
   const [collapsed, setCollapsed] = useState(false)
 
@@ -59,7 +59,7 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
         'min-h-[calc(100vh-72px)]'
       )}>
         {/* 토글 버튼 */}
-        <button 
+        <button
           onClick={toggleSidebar}
           className="absolute -right-3 top-6 bg-[#190a49] text-white w-6 h-6 rounded-full flex items-center justify-center z-50 shadow-md hover:bg-[#0f0533] transition-colors"
           aria-label={collapsed ? '사이드바 펼치기' : '사이드바 접기'}
@@ -75,7 +75,7 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
         >
           <X size={20} />
         </button>
-        
+
         <div className="p-4">
           {/* 관리자 프로필 */}
           {!collapsed && (
@@ -94,15 +94,15 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
             {navItems.map((item) => {
               const IconComponent = item.icon
               const isActive = selectedNav === item.key
-              
+
               return (
                 <Link
                   key={item.key}
                   href={item.href}
                   className={classNames(
                     'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors',
-                    isActive 
-                      ? 'bg-[#0078d2] text-white' 
+                    isActive
+                      ? 'bg-[#0078d2] text-white'
                       : 'text-[#bfc5c8] hover:bg-[#f5f5f5]',
                     collapsed && 'justify-center'
                   )}
