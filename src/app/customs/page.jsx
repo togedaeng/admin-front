@@ -1,81 +1,95 @@
 "use client";
 
-
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { DataTable } from "@/components/ui";
 import StatusButton from "@/components/ui/StatusButton";
-import { dogsAPI } from "@/lib/api";
+import { customsAPI } from "@/lib/api";
 import PageContainer from "@/components/ui/PageContainer";
 import { Pagination } from "@/components/features/Pagination";
 import { useRouter } from "next/navigation";
 
-const dogStatusLabel = {
-  REGISTERED: "요청",
-  APPROVED: "승인",
-  SUSPENDED: "중지",
-  REMOVED: "삭제"
+const customStatusLabel = {
+  PENDING: "대기",
+  IN_PROGRESS: "진행중",
+  COMPLETED: "완료",
+  HOLD: "보류",
+  CANCELED: "취소",
 };
 
-export default function DogsPage() {
+export default function CustomsPage() {
   const router = useRouter();
-  const [dogData, setDogData] = useState([]);
+  const [customPage, setCustomPage] = useState(null); // Page 객체 전체 저장
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
   useEffect(() => {
-    const fetchDogs = async () => {
+    const fetchCustoms = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        const dogs = await dogsAPI.getDogs();
-        setDogData(dogs || []);
+        // 백엔드 API가 page=0부터 시작하므로 -1
+        const data = await customsAPI.getCustoms({ page: currentPage - 1, size: itemsPerPage });
+        setCustomPage(data);
       } catch (err) {
-        setError("반려견 데이터를 불러오는데 실패했습니다.");
+        setError("커스텀 요청 데이터를 불러오는데 실패했습니다.");
       } finally {
         setIsLoading(false);
       }
     };
-    fetchDogs();
-  }, []);
+    fetchCustoms();
+  }, [currentPage]);
 
-  const paginatedData = useMemo(() => {
-    return dogData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  }, [dogData, currentPage]);
-
-  const totalPages = Math.ceil(dogData.length / itemsPerPage);
+  const tableData = customPage?.content || [];
+  const totalPages = customPage?.totalPages || 1;
 
   const handleRowAction = (row) => {
-    router.push(`/dogs/${row.id}`);
+    router.push(`/customs/${row.id}`);
   };
 
   const columns = [
     { header: "ID", key: "id" },
-    { header: "이름", key: "name" },
+    { header: "반려견 이름", key: "dogName" },
     { header: "주인 닉네임", key: "ownerNickname" },
+    { header: "담당자", key: "adminNickname" },
     {
       header: "상태",
       key: "status",
       render: (v) => (
-        <StatusButton label={dogStatusLabel[v] || v} type="dogStatus" status={v} />
+        <StatusButton label={customStatusLabel[v] || v} type="customStatus" status={v} />
       ),
     },
     {
-      header: "등록일",
+      header: "요청일",
       key: "createdAt",
       render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
     },
     {
-      header: "삭제일",
-      key: "deletedAt",
+      header: "작업시작일",
+      key: "startedAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+    {
+      header: "보류일",
+      key: "holdCreatedAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+    {
+      header: "완료일",
+      key: "completedAt",
+      render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
+    },
+    {
+      header: "취소일",
+      key: "canceledAt",
       render: (v) => v ? new Date(v).toISOString().slice(0, 10) : "-",
     },
   ];
 
   if (isLoading) {
     return (
-      <PageContainer title="반려견 정보">
+      <PageContainer title="커스텀 요청 정보">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0' }}>
           <div style={{ border: '4px solid rgba(0,0,0,0.1)', borderTop: '4px solid #2563eb', borderRadius: '50%', width: 32, height: 32, animation: 'spin 1s linear infinite' }} />
           <span style={{ marginTop: 8, color: '#4b5563' }}>데이터를 불러오는 중...</span>
@@ -86,7 +100,7 @@ export default function DogsPage() {
 
   if (error) {
     return (
-      <PageContainer title="반려견 정보">
+      <PageContainer title="커스텀 요청 정보">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 0' }}>
           <div style={{ color: '#dc2626', marginBottom: 8 }}>{error}</div>
           <button onClick={() => window.location.reload()} style={{ marginTop: 16, padding: '8px 16px', backgroundColor: '#2563eb', color: '#fff', borderRadius: 6, border: 'none', cursor: 'pointer' }}>다시 시도</button>
@@ -96,12 +110,12 @@ export default function DogsPage() {
   }
 
   return (
-    <PageContainer title="반려견 정보"
+    <PageContainer title="커스텀 요청 정보"
       currentPage={currentPage}
       totalPages={totalPages}
       onPageChange={setCurrentPage}
     >
-      <DataTable columns={columns} data={paginatedData} onRowAction={handleRowAction} />
+      <DataTable columns={columns} data={tableData} onRowAction={handleRowAction} />
     </PageContainer>
   );
 } 

@@ -82,24 +82,6 @@ export default function DataTable({
           )}
         </tbody>
       </table>
-      {/* Pagination */}
-      <div className="flex items-center justify-center gap-2 p-6">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage <= 1}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <ChevronLeft className="w-4 h-4 text-[#404040]" />
-        </button>
-        <span className="text-sm text-[#1d1b20]">{currentPage} / {totalPages}</span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages}
-          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <ChevronRight className="w-4 h-4 text-[#404040]" />
-        </button>
-      </div>
     </div>
   )
 } 
