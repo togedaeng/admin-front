@@ -140,5 +140,9 @@ export const dogsAPI = {
 
 export const customsAPI = {
   getCustoms: () => apiGet('/api/custom'),
-  getCustom: (id) => apiGet(`/api/custom/${id}`)
+  getCustom: (id) => apiGet(`/api/custom/${id}`),
+  updateCustomStatusInProgress: (id, data) => apiPut(`/api/custom/${id}/in-progress`, data), // 진행중
+  updateCustomStatusHold: (id, data) => apiPut(`/api/custom/${id}/hold`, data), // 보류(*보류사유)
+  updateCustomStatusCompleted: (id, formData) => apiRequest(`${API_BASE_URL}/api/custom/${id}/completed`, { method: 'PUT', body: formData }), // 완료(모델넣어줘야됨)
+  updateCustomStatusCanceled: (id, data) => apiPut(`/api/custom/${id}/canceled`, data), // 취소(관리자id 받아야됨)
 };
