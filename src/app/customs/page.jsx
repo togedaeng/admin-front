@@ -134,7 +134,7 @@ export default function CustomsPage() {
       <select
         value={statusFilter}
         onChange={e => setStatusFilter(e.target.value)}
-        style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120 }}
+        style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, color: '#979797' }}
       >
         {customStatusOptions.map(opt => (
           <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -145,7 +145,7 @@ export default function CustomsPage() {
         placeholder="담당자 검색"
         value={adminSearch}
         onChange={e => setAdminSearch(e.target.value)}
-        style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120 }}
+        style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, color: '#979797' }}
       />
     </div>
     <DataTable columns={columns} data={tableData} onRowAction={handleRowAction} />
