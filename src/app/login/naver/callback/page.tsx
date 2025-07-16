@@ -36,7 +36,7 @@ export default function NaverCallbackPage() {
           },
           body: JSON.stringify({ 
             code: code,
-            redirectUri: `${window.location.origin}/login/naver/callback`
+            redirectUri: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/login/naver/callback`
           }),
         });
 
