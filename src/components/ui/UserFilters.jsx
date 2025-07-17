@@ -105,6 +105,7 @@ export default function UserFilters({
         <button
           type="button"
           className="flex items-center gap-2 border border-[#ddd] rounded px-3 py-2 text-sm bg-white hover:bg-gray-50"
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, minHeight: 42 }}
           onClick={handleSearchDropdownToggle}
         >
           {searchField === 'email' ? '이메일' : '닉네임'}
@@ -139,6 +140,7 @@ export default function UserFilters({
         <button
           type="button"
           className="flex items-center gap-2 border border-[#ddd] rounded px-3 py-2 text-sm bg-white hover:bg-gray-50"
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, minHeight: 42 }}
           onClick={handleRoleDropdownToggle}
         >
           {roleFilter === "ALL" ? "권한: 모두" : roleFilter === "USER" ? "권한: 회원" : "권한: 관리자"}
@@ -168,6 +170,7 @@ export default function UserFilters({
         <button
           type="button"
           className="flex items-center gap-2 border border-[#ddd] rounded px-3 py-2 text-sm bg-white hover:bg-gray-50"
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, minHeight: 42 }}
           onClick={handleStatusDropdownToggle}
         >
           {statusFilter === "ALL" ? "상태: 모두" : statusFilter === "ACTIVE" ? "상태: 정상" : statusFilter === "SUSPENDED" ? "상태: 차단" : "상태: 탈퇴"}
@@ -201,9 +204,10 @@ export default function UserFilters({
         <button
           type="button"
           className="flex items-center gap-2 border border-[#ddd] rounded px-3 py-2 text-sm bg-white hover:bg-gray-50"
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, minHeight: 42 }}
           onClick={handleGenderDropdownToggle}
         >
-          {genderFilter === "ALL" ? "성별: 모두" : genderFilter === "F" ? "성별: 여" : "성별: 남"}
+          {genderFilter === "ALL" ? "성별: 전체" : genderFilter === "F" ? "성별: 여" : "성별: 남"}
           <ChevronDown className="w-4 h-4 text-[#777]" />
         </button>
 
@@ -230,6 +234,7 @@ export default function UserFilters({
         <button
           type="button"
           className="flex items-center gap-2 border border-[#ddd] rounded px-3 py-2 text-sm bg-white hover:bg-gray-50"
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, minHeight: 42 }}
           onClick={handleJoinDateDropdownToggle}
         >
           {joinDateSort === "latest" ? "가입일: 최신순" : "가입일: 오래된순"}
@@ -255,6 +260,7 @@ export default function UserFilters({
         <button
           type="button"
           className="flex items-center gap-2 border border-[#ddd] rounded px-3 py-2 text-sm bg-white hover:bg-gray-50"
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, minHeight: 42 }}
           onClick={handleDeleteDateDropdownToggle}
         >
           {deleteDateSort === "latest" ? "삭제일: 최신순" : "삭제일: 오래된순"}

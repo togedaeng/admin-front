@@ -2,12 +2,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 
-export default function GoogleCallbackPage() {
+export default function NaverCallbackPage() {
   const router = useRouter();
   const { checkAuth } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
@@ -15,7 +16,7 @@ export default function GoogleCallbackPage() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get("code");
         const error = urlParams.get("error");
-        
+
         if (error) {
           setError("로그인 중 오류가 발생했습니다.");
           setIsLoading(false);
@@ -28,29 +29,37 @@ export default function GoogleCallbackPage() {
           return;
         }
 
-        // 백엔드로 authorization code 전송
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/oauth/google`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/oauth/naver`, {
           method: "POST",
-          headers: { 
-            "Content-Type": "application/json" 
+          headers: {
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             code: code,
-            redirectUri: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/login/google/callback`
+            redirectUri: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/login/naver/callback`
           }),
         });
 
         if (response.status === 200) {
-          // 기존 회원 - JWT 토큰 받음
           const tokenData = await response.json();
           localStorage.setItem('auth_token', tokenData.accessToken);
+
+          const decoded = jwtDecode(tokenData.accessToken);
+          const role = decoded.role;
+
+          if (role === "ADMIN") {
+            router.push('/');
+          } else if (role === "USER") {
+            router.push('/inquiry');
+          } else {
+            router.push('/login');
+          }
+
           await checkAuth();
-          router.push('/'); // 메인 페이지로 이동
         } else if (response.status === 202) {
-          // 신규 회원 - 추가 정보 입력 필요
           const userInfo = await response.json();
           localStorage.setItem('tempUserInfo', JSON.stringify(userInfo));
-          router.push('/signup'); // 회원가입 페이지로 이동
+          router.push('/signup');
         } else {
           setError("로그인 처리 중 오류가 발생했습니다.");
         }
@@ -63,10 +72,10 @@ export default function GoogleCallbackPage() {
     };
 
     handleOAuthCallback();
-  }, [router, checkAuth]);
+  }, [router]);
 
   if (isLoading) {
-    return <div>구글 로그인 처리 중...</div>;
+    return <div>네이버 로그인 처리 중...</div>;
   }
 
   if (error) {
@@ -74,4 +83,4 @@ export default function GoogleCallbackPage() {
   }
 
   return <div>로그인 처리 중...</div>;
-} 
+}

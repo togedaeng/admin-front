@@ -16,12 +16,23 @@ const dogStatusLabel = {
   REMOVED: "삭제"
 };
 
+const dogStatusOptions = [
+  { value: "ALL", label: "상태(전체)" },
+  { value: "REGISTERED", label: "요청" },
+  { value: "APPROVED", label: "승인" },
+  { value: "SUSPENDED", label: "중지" },
+  { value: "REMOVED", label: "삭제" },
+];
+
 export default function DogsPage() {
   const router = useRouter();
   const [dogData, setDogData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [nameSearch, setNameSearch] = useState("");
+  const [ownerSearch, setOwnerSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -40,11 +51,20 @@ export default function DogsPage() {
     fetchDogs();
   }, []);
 
-  const paginatedData = useMemo(() => {
-    return dogData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  }, [dogData, currentPage]);
+  const filteredData = useMemo(() => {
+    return dogData.filter(item => {
+      if (nameSearch && !(item.name || "").toLowerCase().includes(nameSearch.toLowerCase())) return false;
+      if (ownerSearch && !(item.ownerNickname || "").toLowerCase().includes(ownerSearch.toLowerCase())) return false;
+      if (statusFilter !== "ALL" && item.status !== statusFilter) return false;
+      return true;
+    });
+  }, [dogData, nameSearch, ownerSearch, statusFilter]);
 
-  const totalPages = Math.ceil(dogData.length / itemsPerPage);
+  const paginatedData = useMemo(() => {
+    return filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  }, [filteredData, currentPage]);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handleRowAction = (row) => {
     router.push(`/dogs/${row.id}`);
@@ -101,6 +121,31 @@ export default function DogsPage() {
       totalPages={totalPages}
       onPageChange={setCurrentPage}
     >
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
+        <input
+          type="text"
+          placeholder="강아지 이름 검색"
+          value={nameSearch}
+          onChange={e => setNameSearch(e.target.value)}
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, color: '#979797' }}
+        />
+        <input
+          type="text"
+          placeholder="주인 닉네임 검색"
+          value={ownerSearch}
+          onChange={e => setOwnerSearch(e.target.value)}
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, color: '#979797' }}
+        />
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+          style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, color: '#979797' }}
+        >
+          {dogStatusOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      </div>
       <DataTable columns={columns} data={paginatedData} onRowAction={handleRowAction} />
     </PageContainer>
   );

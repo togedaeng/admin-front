@@ -16,12 +16,23 @@ const customStatusLabel = {
   CANCELED: "취소",
 };
 
+const customStatusOptions = [
+  { value: "ALL", label: "전체" },
+  { value: "PENDING", label: "대기" },
+  { value: "IN_PROGRESS", label: "진행중" },
+  { value: "COMPLETED", label: "완료" },
+  { value: "HOLD", label: "보류" },
+  { value: "CANCELED", label: "취소" },
+];
+
 export default function CustomsPage() {
   const router = useRouter();
   const [customPage, setCustomPage] = useState(null); // Page 객체 전체 저장
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [adminSearch, setAdminSearch] = useState("");
   const itemsPerPage = 8;
 
   useEffect(() => {
@@ -41,7 +52,11 @@ export default function CustomsPage() {
     fetchCustoms();
   }, [currentPage]);
 
-  const tableData = customPage?.content || [];
+  const tableData = (customPage?.content || []).filter(item => {
+    if (statusFilter !== "ALL" && item.status !== statusFilter) return false;
+    if (adminSearch && !(item.adminNickname || "").toLowerCase().includes(adminSearch.toLowerCase())) return false;
+    return true;
+  });
   const totalPages = customPage?.totalPages || 1;
 
   const handleRowAction = (row) => {
@@ -115,7 +130,25 @@ export default function CustomsPage() {
       totalPages={totalPages}
       onPageChange={setCurrentPage}
     >
-      <DataTable columns={columns} data={tableData} onRowAction={handleRowAction} />
+    <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
+      <select
+        value={statusFilter}
+        onChange={e => setStatusFilter(e.target.value)}
+        style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, color: '#979797' }}
+      >
+        {customStatusOptions.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+      <input
+        type="text"
+        placeholder="담당자 검색"
+        value={adminSearch}
+        onChange={e => setAdminSearch(e.target.value)}
+        style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #ddd', minWidth: 120, color: '#979797' }}
+      />
+    </div>
+    <DataTable columns={columns} data={tableData} onRowAction={handleRowAction} />
     </PageContainer>
   );
 } 
