@@ -41,12 +41,12 @@ export default function NoticeCreatePage() {
 
   return (
     <div className="max-w-xl mx-auto bg-white rounded-lg shadow p-8 mt-10 mb-10">
-      <h2 className="text-2xl font-bold mb-6 text-[#2563eb]">공지 등록</h2>
+      <h2 className="text-2xl font-bold mb-6 text-black">공지 등록</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block font-semibold mb-1">카테고리</label>
+          <label className="block font-semibold mb-1 text-black">카테고리</label>
           <select
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-black"
             value={category}
             onChange={e => setCategory(e.target.value)}
             required
@@ -58,9 +58,9 @@ export default function NoticeCreatePage() {
           </select>
         </div>
         <div>
-          <label className="block font-semibold mb-1">제목</label>
+          <label className="block font-semibold mb-1 text-black">제목</label>
           <input
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-black"
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
@@ -68,16 +68,16 @@ export default function NoticeCreatePage() {
           />
         </div>
         <div>
-          <label className="block font-semibold mb-1">내용</label>
+          <label className="block font-semibold mb-1 text-black">내용</label>
           <textarea
-            className="w-full border border-gray-300 rounded px-3 py-2 min-h-[120px]"
+            className="w-full border border-gray-300 rounded px-3 py-2 min-h-[120px] text-black"
             value={content}
             onChange={e => setContent(e.target.value)}
             required
           />
         </div>
         <div>
-          <label className="block font-semibold mb-1">이미지 첨부 (여러 개 가능)</label>
+          <label className="block font-semibold mb-1 text-black">이미지 첨부 (여러 개 가능)</label>
           <input
             type="file"
             accept="image/*"
@@ -87,7 +87,7 @@ export default function NoticeCreatePage() {
           {images.length > 0 && (
             <div className="flex gap-2 mt-2 flex-wrap">
               {images.map((file, idx) => (
-                <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded">{file.name}</span>
+                <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded text-black">{file.name}</span>
               ))}
             </div>
           )}

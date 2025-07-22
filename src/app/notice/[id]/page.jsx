@@ -67,10 +67,10 @@ export default function NoticeDetailPage() {
       <div className={styles.meta}>
         작성자: {notice.authorNickname} | 등록일: {notice.createdAt ? new Date(notice.createdAt).toLocaleString() : "-"} | 수정일: {notice.updatedAt ? new Date(notice.updatedAt).toLocaleString() : "-"}
       </div>
-      {notice.imageUrls && notice.imageUrls.length > 0 && (
+      {notice.images && notice.images.length > 0 && (
         <div className={styles.imageGallery}>
-          {notice.imageUrls.map((url, idx) => (
-            <img key={idx} src={url} alt={`공지 이미지 ${idx + 1}`} />
+          {notice.images.map((image) => (
+            <img key={image.id} src={image.url} alt={`공지 이미지 ${image.id}`} />
           ))}
         </div>
       )}

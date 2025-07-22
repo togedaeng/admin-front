@@ -85,12 +85,12 @@ export default function NoticeEditPage() {
 
   return (
     <div className="max-w-xl mx-auto bg-white rounded-lg shadow p-8 mt-10 mb-10">
-      <h2 className="text-2xl font-bold mb-6 text-[#2563eb]">공지 수정</h2>
+      <h2 className="text-2xl font-bold mb-6 text-black">공지 수정</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block font-semibold mb-1">카테고리</label>
+          <label className="block font-semibold mb-1 text-black">카테고리</label>
           <select
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-black"
             value={category}
             onChange={e => setCategory(e.target.value)}
             required
@@ -102,9 +102,9 @@ export default function NoticeEditPage() {
           </select>
         </div>
         <div>
-          <label className="block font-semibold mb-1">제목</label>
+          <label className="block font-semibold mb-1 text-black">제목</label>
           <input
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-black"
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
@@ -112,35 +112,57 @@ export default function NoticeEditPage() {
           />
         </div>
         <div>
-          <label className="block font-semibold mb-1">내용</label>
+          <label className="block font-semibold mb-1 text-black">내용</label>
           <textarea
-            className="w-full border border-gray-300 rounded px-3 py-2 min-h-[120px]"
+            className="w-full border border-gray-300 rounded px-3 py-2 min-h-[120px] text-black"
             value={content}
             onChange={e => setContent(e.target.value)}
             required
           />
         </div>
-        {notice.imageUrls && notice.imageUrls.length > 0 && (
+        {notice.images && notice.images.length > 0 && (
           <div>
-            <label className="block font-semibold mb-1">기존 이미지</label>
+            <label className="block font-semibold mb-1 text-black">기존 이미지</label>
             <div className="flex gap-2 flex-wrap">
-              {notice.imageUrls.map((url, idx) => (
-                <div key={idx} className="relative">
-                  <img src={url} alt={`기존 이미지 ${idx + 1}`} className="w-20 h-20 object-cover rounded" />
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteImage(idx)}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs"
+              {notice.images.map((image) => {
+                // 현재 이미지가 삭제 예정 목록에 있는지 확인합니다.
+                const isMarkedForDeletion = deleteImageIds.includes(image.id);
+
+                return (
+                  <div
+                    key={image.id}
+                    className="relative w-24 h-24" // 크기 조절을 위해 w-20, h-20에서 변경
+                    onClick={() => handleDeleteImage(image.id)} // 이미지 클릭으로도 토글 가능
+                    style={{ cursor: 'pointer' }}
                   >
-                    ×
-                  </button>
-                </div>
-              ))}
+                    <img
+                      src={image.url}
+                      alt={`기존 이미지 ${image.id}`}
+                      className={`w-full h-full object-cover rounded ${isMarkedForDeletion ? 'opacity-30' : ''}`} // 삭제 예정일 때 이미지 어둡게
+                    />
+
+                    {isMarkedForDeletion ? (
+                      // 삭제 예정일 때 표시될 오버레이
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-60 rounded">
+                        <span className="text-white text-sm font-bold">삭제 예정</span>
+                      </div>
+                    ) : (
+                      // 기본 상태일 때 표시될 삭제 버튼
+                      <button
+                        type="button"
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600 z-10"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
         <div>
-          <label className="block font-semibold mb-1">새 이미지 첨부</label>
+          <label className="block font-semibold mb-1 text-black">새 이미지 첨부</label>
           <input
             type="file"
             accept="image/*"
@@ -150,7 +172,7 @@ export default function NoticeEditPage() {
           {newImages.length > 0 && (
             <div className="flex gap-2 mt-2 flex-wrap">
               {newImages.map((file, idx) => (
-                <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded">{file.name}</span>
+                <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded text-black">{file.name}</span>
               ))}
             </div>
           )}
