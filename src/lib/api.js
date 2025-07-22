@@ -128,7 +128,7 @@ export const usersAPI = {
   deleteUser: (id) => apiDelete(`/user/${id}`),
   getCustomhistorylist: (id) => apiGet(`/api/custom/list/${id}`),
   getUsersDog: (id) => apiGet(`/api/dog/${id}`)
-}; 
+};
 
 export const dogsAPI = {
   getDogs: () => apiGet('/api/dog'),
@@ -145,4 +145,40 @@ export const customsAPI = {
   updateCustomStatusHold: (id, data) => apiPut(`/api/custom/${id}/hold`, data), // 보류(*보류사유)
   updateCustomStatusCompleted: (id, formData) => apiRequest(`${API_BASE_URL}/api/custom/${id}/completed`, { method: 'PUT', body: formData }), // 완료(모델넣어줘야됨)
   updateCustomStatusCanceled: (id, data) => apiPut(`/api/custom/${id}/canceled`, data), // 취소(관리자id 받아야됨)
+};
+
+export const noticeAPI = {
+  getNotices: ({ status = "PUBLISHED" } = {}) => apiGet(`/api/notice?status=${status}`),
+  getNotice: (id) => apiGet(`/api/notice/${id}`),
+  createNotice: async ({ category, title, content, images }) => {
+    const formData = new FormData();
+    const requestDto = JSON.stringify({ category, title, content });
+    formData.append('requestDto', new Blob([requestDto], { type: 'application/json' }));
+    if (images && images.length > 0) {
+      images.forEach((file) => formData.append('images', file));
+    }
+    return apiRequest('/api/notice/create', {
+      method: 'POST',
+      body: formData,
+    });
+  },
+  updateNotice: async ({ id, category, title, content, deleteImageIds, newImages }) => {
+    const formData = new FormData();
+    const requestDto = JSON.stringify({ category, title, content, deleteImageIds });
+    formData.append('requestDto', new Blob([requestDto], { type: 'application/json' }));
+    if (newImages && newImages.length > 0) {
+      newImages.forEach((file) => formData.append('newImages', file));
+    }
+    return apiRequest(`/api/notice/${id}/post`, {
+      method: 'PATCH',
+      body: formData,
+    });
+  },
+  deleteNotice: (id) => apiRequest(`/api/notice/${id}/status`, { method: 'PATCH' }),
+};
+
+export const inquiryAPI = {
+  getInquiries: () => apiGet('/api/inquiry'),
+  getInquiry: (id) => apiGet(`/api/inquiry/${id}`),
+  createAnswer: (inquiryId, answerContent) => apiPost(`/api/inquiry/${inquiryId}/answer`, { comment: answerContent }),
 };
