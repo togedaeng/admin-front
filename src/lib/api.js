@@ -148,5 +148,37 @@ export const customsAPI = {
 };
 
 export const noticeAPI = {
-  getNotices: () => apiGet(`/api/notice`),
+  getNotices: ({ status = "PUBLISHED" } = {}) => apiGet(`/api/notice?status=${status}`),
+  getNotice: (id) => apiGet(`/api/notice/${id}`),
+  createNotice: async ({ category, title, content, images }) => {
+    const formData = new FormData();
+    const requestDto = JSON.stringify({ category, title, content });
+    formData.append('requestDto', new Blob([requestDto], { type: 'application/json' }));
+    if (images && images.length > 0) {
+      images.forEach((file) => formData.append('images', file));
+    }
+    return apiRequest('/api/notice/create', {
+      method: 'POST',
+      body: formData,
+    });
+  },
+  updateNotice: async ({ id, category, title, content, deleteImageIds, newImages }) => {
+    const formData = new FormData();
+    const requestDto = JSON.stringify({ category, title, content, deleteImageIds });
+    formData.append('requestDto', new Blob([requestDto], { type: 'application/json' }));
+    if (newImages && newImages.length > 0) {
+      newImages.forEach((file) => formData.append('newImages', file));
+    }
+    return apiRequest(`/api/notice/${id}/post`, {
+      method: 'PATCH',
+      body: formData,
+    });
+  },
+  deleteNotice: (id) => apiRequest(`/api/notice/${id}/status`, { method: 'PATCH' }),
+};
+
+export const inquiryAPI = {
+  getInquiries: () => apiGet('/api/inquiry'),
+  getInquiry: (id) => apiGet(`/api/inquiry/${id}`),
+  createAnswer: (inquiryId, answerContent) => apiPost(`/api/inquiry/${inquiryId}/answer`, { comment: answerContent }),
 };

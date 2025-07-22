@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { DataTable, FilterPanel } from "@/components/ui";
 import { noticeAPI } from "@/lib/api";
 import PageContainer from "@/components/ui/PageContainer";
+import { useRouter } from "next/navigation";
 
 const noticeCategoryOptions = [
   { value: "", label: "전체" },
@@ -41,13 +42,14 @@ export default function NoticePage() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const router = useRouter();
 
   useEffect(() => {
     const fetchNotices = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await noticeAPI.getNotices({ page: 0, size: 1000 }); // 전체 불러와서 클라이언트 페이지네이션
+        const data = await noticeAPI.getNotices();
         setNoticeList(Array.isArray(data) ? data : []);
       } catch (err) {
         setError("공지사항 데이터를 불러오는데 실패했습니다.");
@@ -90,7 +92,7 @@ export default function NoticePage() {
   ];
 
   const handleRowAction = (row) => {
-    alert(`공지 상세: ${row.title}`);
+    router.push(`/notice/${row.id}`);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -107,7 +109,7 @@ export default function NoticePage() {
       <div className="flex items-center justify-between mb-6">
         <div />
         <button
-          onClick={() => alert("공지사항 등록 기능 준비중")}
+          onClick={() => router.push("/notice/create")}
           className="bg-[#47caeb] hover:bg-[#47caeb]/90 text-white rounded-lg px-6 py-2 text-sm font-medium transition-colors"
         >
           등록
