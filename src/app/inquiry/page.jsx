@@ -1,146 +1,183 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { DataTable, FilterPanel } from "@/components/ui"
+import { useState, useEffect } from "react";
+import { DataTable, FilterPanel } from "@/components/ui";
+import { inquiryAPI } from "@/lib/api";
+import { useRouter } from "next/navigation";
+
+const categoryOptions = [
+  { value: "", label: "전체" },
+  { value: "BUG", label: "버그/오류" },
+  { value: "ACCOUNT", label: "계정문의" },
+  { value: "FEEDBACK", label: "피드백" },
+  { value: "ETC", label: "기타" },
+];
+
+const statusOptions = [
+  { value: "", label: "전체" },
+  { value: "WAITING", label: "답변대기" },
+  { value: "ANSWERED", label: "답변완료" },
+];
+
+const sortOrderOptions = [
+  { value: "latest", label: "최신순" },
+  { value: "oldest", label: "오래된순" },
+];
+
+const filterConfig = [
+  {
+    type: "select",
+    key: "category",
+    placeholder: "카테고리",
+    options: categoryOptions,
+  },
+  { type: "search", key: "author", placeholder: "작성자" },
+  {
+    type: "select",
+    key: "status",
+    placeholder: "처리상태",
+    options: statusOptions,
+  },
+  {
+    type: "select",
+    key: "sortOrder",
+    placeholder: "최신순",
+    options: sortOrderOptions,
+  },
+  { type: "empty" },
+];
+
+function getStatusBadgeClass(status) {
+  if (status === "WAITING") return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200";
+  if (status === "ANSWERED") return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200";
+  return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200";
+}
+
+function getStatusLabel(status) {
+  if (status === "WAITING") return "답변대기";
+  if (status === "ANSWERED") return "답변완료";
+  return status;
+}
+
+function getCategoryLabel(category) {
+  switch (category) {
+    case "BUG": return "버그/오류";
+    case "ACCOUNT": return "계정문의";
+    case "FEEDBACK": return "피드백";
+    case "ETC": return "기타";
+    default: return category;
+  }
+}
 
 export default function InquiryPage() {
-  const [filters, setFilters] = useState({
-    category: '',
-    author: '',
-    status: '',
-    sortOrder: ''
-  })
+  const [filters, setFilters] = useState({ category: "", author: "", status: "", sortOrder: "latest" });
+  const [inquiryList, setInquiryList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const router = useRouter();
 
-  const [currentPage, setCurrentPage] = useState(1)
+  useEffect(() => {
+    const fetchInquiries = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await inquiryAPI.getInquiries();
+        setInquiryList(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError("문의 목록을 불러오는데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchInquiries();
+  }, []);
 
-  const inquiryData = [
-    { id: 8, category: "기술문의", title: "앱이 자꾸 꺼져요", author: "서현", status: "답변완료", date: "2025.01.15" },
-    { id: 7, category: "계정문의", title: "비밀번호 변경 문의", author: "다은", status: "처리중", date: "2025.01.14" },
-    { id: 6, category: "서비스문의", title: "강아지 등록이 안돼요", author: "임정", status: "답변완료", date: "2025.01.13" },
-    { id: 5, category: "기술문의", title: "사진 업로드 오류", author: "갱갱", status: "접수", date: "2025.01.12" },
-    { id: 4, category: "결제문의", title: "결제 취소 요청", author: "큰나", status: "처리중", date: "2025.01.11" },
-    { id: 3, category: "서비스문의", title: "모델링 진행 상황 문의", author: "누나", status: "답변완료", date: "2025.01.10" },
-    { id: 2, category: "계정문의", title: "회원탈퇴 문의", author: "윤지", status: "처리중", date: "2025.01.09" },
-    { id: 1, category: "기타", title: "앱 사용법 문의", author: "서진", status: "답변완료", date: "2025.01.08" },
-  ]
+  // 필터링
+  let filteredData = inquiryList.filter((item) => {
+    if (filters.category && item.category !== filters.category) return false;
+    if (filters.author && !(item.authorNickname || "").toLowerCase().includes(filters.author.toLowerCase())) return false;
+    if (filters.status && item.status !== filters.status) return false;
+    return true;
+  });
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case '접수':
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200";
-      case '처리중':
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200";
-      case '답변완료':
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200";
-      default:
-        return "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200";
+  // 정렬
+  filteredData = filteredData.sort((a, b) => {
+    if (filters.sortOrder === "oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
     }
-  }
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
 
-  // 필터 정의
-  const filterConfig = [
-    { 
-      type: 'select', 
-      key: 'category', 
-      placeholder: '카테고리',
-      options: [
-        { value: '기술문의', label: '기술문의' },
-        { value: '계정문의', label: '계정문의' },
-        { value: '서비스문의', label: '서비스문의' },
-        { value: '결제문의', label: '결제문의' },
-        { value: '기타', label: '기타' }
-      ]
-    },
-    { type: 'search', key: 'author', placeholder: '작성자' },
-    { 
-      type: 'select', 
-      key: 'status', 
-      placeholder: '처리상태',
-      options: [
-        { value: '접수', label: '접수' },
-        { value: '처리중', label: '처리중' },
-        { value: '답변완료', label: '답변완료' }
-      ]
-    },
-    { 
-      type: 'select', 
-      key: 'sortOrder', 
-      placeholder: '최신순',
-      options: [
-        { value: 'latest', label: '최신순' },
-        { value: 'oldest', label: '오래된순' }
-      ]
-    },
-    { type: 'empty' }  // 5번째 컬럼을 위한 빈 공간
-  ]
+  // 페이지네이션
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
+  const pagedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  // 테이블 컬럼 정의
   const columns = [
-    { key: 'id', header: 'ID' },
-    { key: 'category', header: '카테고리' },
-    { key: 'title', header: '제목' },
-    { key: 'author', header: '작성자' },
-    { 
-      key: 'status', 
-      header: '처리상태',
-      render: (value) => (
-        <span className={getStatusBadge(value)}>
-          {value}
-        </span>
-      )
+    { header: "ID", key: "id" },
+    { header: "카테고리", key: "category", render: (v) => getCategoryLabel(v) },
+    { header: "제목", key: "title" },
+    { header: "작성자", key: "authorNickname" },
+    {
+      header: "처리상태",
+      key: "status",
+      render: (v) => <span className={getStatusBadgeClass(v)}>{getStatusLabel(v)}</span>,
     },
-    { key: 'date', header: '등록일' }
-  ]
+    {
+      header: "등록일",
+      key: "createdAt",
+      render: (v) => (v ? new Date(v).toISOString().slice(0, 10) : "-"),
+    },
+  ];
 
-  // 페이지네이션 계산
-  const itemsPerPage = 10
-  const totalPages = Math.ceil(inquiryData.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentData = inquiryData.slice(startIndex, endIndex)
-
-  const pagination = {
-    currentPage,
-    totalPages
-  }
+  const handleRowAction = (row) => {
+    router.push(`/inquiry/${row.id}`);
+  };
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters)
-    setCurrentPage(1) // 필터 변경 시 첫 페이지로 이동
-  }
-
-  const handleRowAction = (inquiry) => {
-    console.log('문의사항 상세 정보:', inquiry)
-    // 실제로는 상세 페이지로 이동하거나 모달을 열 것
-  }
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
-    }
-  }
+    setCurrentPage(page);
+  };
 
   return (
     <div className="p-6">
       <div className="bg-white rounded-lg shadow-sm">
         <div className="p-6">
           <h2 className="text-xl font-semibold text-[#000000] mb-6">문의사항</h2>
-
-          <FilterPanel 
-            filters={filterConfig}
-            values={filters}
-            onChange={handleFilterChange}
-          />
-
-          <DataTable 
+          <FilterPanel filters={filterConfig} values={filters} onChange={handleFilterChange} />
+          <DataTable
             columns={columns}
-            data={currentData}
+            data={pagedData}
             onRowAction={handleRowAction}
-            pagination={pagination}
-            onPageChange={handlePageChange}
+            loading={isLoading}
+            error={error}
           />
+          <div className="flex justify-center mt-6">
+            <button
+              className="p-2 text-[#979797] hover:text-[#404040] transition-colors disabled:opacity-50"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage <= 1}
+            >
+              이전
+            </button>
+            <span className="mx-4 text-[#404040] text-sm">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              className="p-2 text-[#979797] hover:text-[#404040] transition-colors disabled:opacity-50"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+            >
+              다음
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 } 
