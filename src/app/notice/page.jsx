@@ -1,123 +1,145 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { DataTable, FilterPanel } from "@/components/ui"
+import { useState, useEffect } from "react";
+import { DataTable, FilterPanel } from "@/components/ui";
+import { noticeAPI } from "@/lib/api";
+import PageContainer from "@/components/ui/PageContainer";
+
+const noticeCategoryOptions = [
+  { value: "", label: "전체" },
+  { value: "ANNOUNCEMENT", label: "공지" },
+  { value: "MAINTENANCE", label: "점검" },
+];
+
+const sortOrderOptions = [
+  { value: "latest", label: "최신순" },
+  { value: "oldest", label: "오래된순" },
+];
+
+const filterConfig = [
+  {
+    type: "select",
+    key: "category",
+    placeholder: "전체",
+    options: noticeCategoryOptions,
+  },
+  { type: "search", key: "title", placeholder: "게시물 제목" },
+  {
+    type: "select",
+    key: "sortOrder",
+    placeholder: "최신순",
+    options: sortOrderOptions,
+  },
+  { type: "empty" },
+  { type: "empty" },
+];
 
 export default function NoticePage() {
-  const [filters, setFilters] = useState({
-    category: '',
-    title: '',
-    sortOrder: ''
-  })
+  const [filters, setFilters] = useState({ category: "", title: "", sortOrder: "latest" });
+  const [noticeList, setNoticeList] = useState([]); // 단순 배열
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
-  const [currentPage, setCurrentPage] = useState(1)
+  useEffect(() => {
+    const fetchNotices = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await noticeAPI.getNotices({ page: 0, size: 1000 }); // 전체 불러와서 클라이언트 페이지네이션
+        setNoticeList(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError("공지사항 데이터를 불러오는데 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNotices();
+  }, []);
 
-  const noticeData = [
-    { id: 6, category: "상점", title: "신규 3층 추가", author: "Admin", date: "2025.06.26" },
-    { id: 5, category: "상점", title: "신규 3층 추가", author: "Admin", date: "2025.06.26" },
-    { id: 4, category: "이벤트", title: "여름 특별 이벤트", author: "Admin", date: "2025.06.25" },
-    { id: 3, category: "상점", title: "신규 3층 추가", author: "Admin", date: "2025.06.26" },
-    { id: 2, category: "시스템", title: "시스템 점검 안내", author: "Admin", date: "2025.06.24" },
-    { id: 1, category: "상점", title: "신규 3층 추가", author: "Admin", date: "2025.06.26" },
-  ]
+  // 필터링 (프론트에서)
+  let filteredData = noticeList.filter((item) => {
+    if (filters.category && item.category !== filters.category) return false;
+    if (filters.title && !(item.title || "").toLowerCase().includes(filters.title.toLowerCase())) return false;
+    return true;
+  });
 
-  // 필터 정의
-  const filterConfig = [
-    { 
-      type: 'select', 
-      key: 'category', 
-      placeholder: '전체',
-      options: [
-        { value: '상점', label: '상점' },
-        { value: '이벤트', label: '이벤트' },
-        { value: '시스템', label: '시스템' }
-      ]
-    },
-    { type: 'search', key: 'title', placeholder: '게시물 제목' },
-    { 
-      type: 'select', 
-      key: 'sortOrder', 
-      placeholder: '최신순',
-      options: [
-        { value: 'latest', label: '최신순' },
-        { value: 'oldest', label: '오래된순' }
-      ]
-    },
-    { type: 'empty' }, // 4번째 컬럼을 위한 빈 공간
-    { type: 'empty' }  // 5번째 컬럼을 위한 빈 공간
-  ]
+  // 정렬 (최신순/오래된순)
+  filteredData = filteredData.sort((a, b) => {
+    if (filters.sortOrder === "oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
 
-  // 테이블 컬럼 정의
+  // 페이지네이션
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
+  const pagedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   const columns = [
-    { key: 'id', header: 'ID' },
-    { key: 'category', header: '카테고리' },
-    { key: 'title', header: '제목' },
-    { key: 'author', header: '작성자' },
-    { key: 'date', header: '등록일' }
-  ]
+    { header: "ID", key: "id" },
+    { header: "카테고리", key: "category", render: (v) => v === "ANNOUNCEMENT" ? "공지" : v === "MAINTENANCE" ? "점검" : "-" },
+    { header: "제목", key: "title" },
+    { header: "작성자", key: "adminNickname" },
+    {
+      header: "등록일",
+      key: "createdAt",
+      render: (v) => (v ? new Date(v).toISOString().slice(0, 10) : "-"),
+    },
+  ];
 
-  // 페이지네이션 계산
-  const itemsPerPage = 10
-  const totalPages = Math.ceil(noticeData.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentData = noticeData.slice(startIndex, endIndex)
-
-  const pagination = {
-    currentPage,
-    totalPages
-  }
+  const handleRowAction = (row) => {
+    alert(`공지 상세: ${row.title}`);
+  };
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters)
-    setCurrentPage(1) // 필터 변경 시 첫 페이지로 이동
-  }
-
-  const handleRowAction = (notice) => {
-    console.log('공지사항 상세 정보:', notice)
-    // 실제로는 상세 페이지로 이동하거나 모달을 열 것
-  }
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
 
   const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
-    }
-  }
-
-  const handleRegister = () => {
-    console.log('공지사항 등록')
-    // 실제로는 등록 페이지로 이동하거나 모달을 열 것
-  }
+    setCurrentPage(page);
+  };
 
   return (
-    <div className="p-6">
-      <div className="bg-white rounded-lg shadow-sm">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-[#000000]">공지사항</h2>
-            <button 
-              onClick={handleRegister}
-              className="bg-[#47caeb] hover:bg-[#47caeb]/90 text-white rounded-lg px-6 py-2 text-sm font-medium transition-colors"
-            >
-              등록
-            </button>
-          </div>
-
-          <FilterPanel 
-            filters={filterConfig}
-            values={filters}
-            onChange={handleFilterChange}
-          />
-
-          <DataTable 
-            columns={columns}
-            data={currentData}
-            onRowAction={handleRowAction}
-            pagination={pagination}
-            onPageChange={handlePageChange}
-          />
-        </div>
+    <PageContainer title="공지사항">
+      <div className="flex items-center justify-between mb-6">
+        <div />
+        <button
+          onClick={() => alert("공지사항 등록 기능 준비중")}
+          className="bg-[#47caeb] hover:bg-[#47caeb]/90 text-white rounded-lg px-6 py-2 text-sm font-medium transition-colors"
+        >
+          등록
+        </button>
       </div>
-    </div>
-  )
+      <FilterPanel filters={filterConfig} values={filters} onChange={handleFilterChange} />
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        onRowAction={handleRowAction}
+        loading={isLoading}
+        error={error}
+      />
+      <div className="flex justify-center mt-6">
+        <button
+          className="p-2 text-[#979797] hover:text-[#404040] transition-colors disabled:opacity-50"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage <= 1}
+        >
+          이전
+        </button>
+        <span className="mx-4 text-[#404040] text-sm">
+          {currentPage} / {totalPages}
+        </span>
+        <button
+          className="p-2 text-[#979797] hover:text-[#404040] transition-colors disabled:opacity-50"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage >= totalPages}
+        >
+          다음
+        </button>
+      </div>
+    </PageContainer>
+  );
 } 

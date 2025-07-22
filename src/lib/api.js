@@ -128,7 +128,7 @@ export const usersAPI = {
   deleteUser: (id) => apiDelete(`/user/${id}`),
   getCustomhistorylist: (id) => apiGet(`/api/custom/list/${id}`),
   getUsersDog: (id) => apiGet(`/api/dog/${id}`)
-}; 
+};
 
 export const dogsAPI = {
   getDogs: () => apiGet('/api/dog'),
@@ -145,4 +145,8 @@ export const customsAPI = {
   updateCustomStatusHold: (id, data) => apiPut(`/api/custom/${id}/hold`, data), // 보류(*보류사유)
   updateCustomStatusCompleted: (id, formData) => apiRequest(`${API_BASE_URL}/api/custom/${id}/completed`, { method: 'PUT', body: formData }), // 완료(모델넣어줘야됨)
   updateCustomStatusCanceled: (id, data) => apiPut(`/api/custom/${id}/canceled`, data), // 취소(관리자id 받아야됨)
+};
+
+export const noticeAPI = {
+  getNotices: () => apiGet(`/api/notice`),
 };
