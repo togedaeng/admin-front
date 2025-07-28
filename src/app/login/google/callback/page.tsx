@@ -15,7 +15,7 @@ export default function GoogleCallbackPage() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get("code");
         const error = urlParams.get("error");
-        
+
         if (error) {
           setError("로그인 중 오류가 발생했습니다.");
           setIsLoading(false);
@@ -31,10 +31,11 @@ export default function GoogleCallbackPage() {
         // 백엔드로 authorization code 전송
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/oauth/google`, {
           method: "POST",
-          headers: { 
-            "Content-Type": "application/json" 
+          headers: {
+            "Content-Type": "application/json",
+            "X-Client-Type': 'WEB"
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             code: code,
             redirectUri: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/login/google/callback`
           }),
