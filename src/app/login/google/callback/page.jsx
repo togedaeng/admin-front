@@ -32,7 +32,8 @@ export default function GoogleCallbackPage() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/oauth/google`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            'X-Client-Type': 'web'
           },
           body: JSON.stringify({
             code: code,
