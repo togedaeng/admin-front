@@ -5,6 +5,7 @@ import { API_BASE_URL, STATUS_CODES } from './constants';
  */
 const defaultHeaders = {
   'Content-Type': 'application/json',
+  'X-Client-Type': 'WEB'
 };
 
 /**
